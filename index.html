@@ -3439,7 +3439,7 @@ function ShareCard({ card, dateStr, qrDataUrl, quote }) {
           <div className="sc__qr-wrap">
             <div className="sc__qr-frame">
               {qrDataUrl ?
-              <img className="sc__qr" src={qrDataUrl} alt="QR code to codices.app" /> :
+              <img className="sc__qr" src={qrDataUrl} alt="QR code to https://codices.vercel.app/" /> :
               <div className="sc__qr-fallback">codices<br />.app</div>}
             </div>
             <div className="sc__qr-caption">scan to explore</div>
@@ -3462,7 +3462,7 @@ function ShareModal({ card, onClose }) {
   pad2(today.getMonth() + 1) + " . " +
   pad2(today.getDate());
 
-  const qrUrl = "https://codices.app";
+  const qrUrl = "https://codices.vercel.app/";
   const qrDataUrl = useQrDataUrl(qrUrl);
 
   // Build a pool of share-worthy sentences for THIS card and pick one
