@@ -1,0 +1,32 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background for clarity during design (remove for production if using transparent) -->
+  <defs>
+    <style>
+      .icon-line { 
+        fill: none; 
+        stroke: #FFFFFF; 
+        stroke-width: 0.6; 
+        stroke-linecap: round; 
+        stroke-linejoin: round;
+      }
+      .icon-dot {
+        fill: #FFFFFF;
+      }
+    </style>
+  </defs>
+  
+  <!-- Outer Diamond (the circuit frame) -->
+  <path class="icon-line" d="M 16 4 L 26 16 L 16 28 L 6 16 Z"/>
+  
+  <!-- Inner S-Curve (the spiral of fate / oracle path) -->
+  <path class="icon-line" d="M 16 8 Q 12 12 12 16 Q 12 20 16 24"/>
+  
+  <!-- Cardinal point circles (4 nodes) -->
+  <circle class="icon-dot" cx="16" cy="6" r="1"/>
+  <circle class="icon-dot" cx="24" cy="16" r="1"/>
+  <circle class="icon-dot" cx="16" cy="26" r="1"/>
+  <circle class="icon-dot" cx="8" cy="16" r="1"/>
+  
+  <!-- Center circle (the oracle eye) -->
+  <circle class="icon-line" cx="16" cy="16" r="2.5"/>
+</svg>
