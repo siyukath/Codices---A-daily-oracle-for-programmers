@@ -1489,6 +1489,10 @@
     transition: opacity 700ms ease-out, transform 700ms ease-out;
     margin-bottom: 64px;
   }
+  
+  @media (max-width: 768px) {
+    .reading-v2__segment { margin-bottom: 40px; }
+  }
   .reading-v2__segment.is-visible {
     opacity: 1;
     transform: translateY(0);
@@ -3244,11 +3248,14 @@ function Reading({ onBack, card }) {
   let transform;
   if (isMobile) {
     const moveY = -(vh / 2 - 80) * cardP;
+    const moveX = 20 * cardP;
     const scaleV = 1 - 0.6 * cardP;
+    const rotate = 12 * cardP;
     transform =
     "translate(-50%, -50%) " +
-    "translate(0, " + moveY + "px) " +
-    "scale(" + scaleV + ")";
+    "translate(" + moveX + "vw, " + moveY + "px) " +
+    "scale(" + scaleV + ") " +
+    "rotate(" + rotate + "deg)";
   } else {
     const moveX = -25 * cardP;
     const scaleV = 1 - 0.5 * cardP;
