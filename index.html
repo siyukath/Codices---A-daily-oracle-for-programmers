@@ -4391,12 +4391,9 @@ function App() {
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 
-setupLogoClick();
-document.addEventListener('DOMContentLoaded', setupLogoClick);
-const logoObserver = new MutationObserver(setupLogoClick);
-logoObserver.observe(document.body, { childList: true, subtree: true });
+// Logo click is handled in Landing component via onClick on brand name
 
-// Mobile enter hint - show when 8 digits entered
+// Mobile device detection
 const isMobileDevice = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 </script>
