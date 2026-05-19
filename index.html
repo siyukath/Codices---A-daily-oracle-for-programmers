@@ -869,6 +869,49 @@
     color: var(--dimmer);
   }
 
+  .landing__submit-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #C9A961;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-weight: bold;
+    animation: arrowFlow 1.2s ease-in-out infinite;
+    z-index: 10;
+  }
+  
+  .landing__submit-arrow:hover {
+    color: #FFE066;
+  }
+  
+  @keyframes arrowFlow {
+    0%, 100% {
+      color: #C9A961;
+      transform: translateY(-50%) translateX(0);
+      filter: drop-shadow(0 0 6px rgba(201, 169, 97, 0.3));
+    }
+    50% {
+      color: #FFE066;
+      transform: translateY(-50%) translateX(3px);
+      filter: drop-shadow(0 0 12px rgba(201, 169, 97, 0.6));
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .landing__submit-arrow { display: none !important; }
+    #hintDesktop { display: block; }
+  }
+  
+  @media (max-width: 768px) {
+    #hintDesktop { display: none; }
+    .landing__inputrow { position: relative; }
+  }
+  
   .landing__enter-button {
     font-family: var(--mono);
     font-size: 13px;
@@ -2898,17 +2941,19 @@ function Landing({ onSubmit,cosmic }) {
             <span className="landing__cursor" aria-hidden="true" />
           </div>
           <div className="landing__error">{error}</div>
-          <div className="landing__hint">
+          <div className="landing__hint" id="hintDesktop">
             // press enter to continue
-            <button 
-              ref={buttonRef}
-              className="landing__enter-button"
-              style={{display: showButton ? 'inline-block' : 'none'}}
-              onClick={handleButtonClick}
-            >
-              ↵ →
-            </button>
           </div>
+          <button 
+            ref={buttonRef}
+            id="mobileSubmitArrow"
+            className="landing__submit-arrow"
+            style={{display: showButton ? 'block' : 'none'}}
+            onClick={handleButtonClick}
+            aria-label="submit"
+          >
+            →
+          </button>
         </div>
       </div>
 
