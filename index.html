@@ -768,6 +768,12 @@
     color: var(--fg);
     letter-spacing: 0.02em;
     line-height: 1;
+    transition: opacity 0.2s, color 0.2s;
+  }
+  
+  .brand__name:hover {
+    opacity: 0.7;
+    color: #C9A961;
   }
   .brand__tag {
     margin-top: 6px;
@@ -3983,45 +3989,72 @@ window.closeAbout = function() {
   if (modal) modal.style.display = 'none';
 };
 
-// Mobile CTA Button logic
-document.addEventListener('DOMContentLoaded', function() {
-  const isMobile = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
-  const checkAndShowButton = () => {
-    const birthInput = document.querySelector('.landing__input');
-    const mobileCTA = document.getElementById('mobileCTA');
-    const compileButton = document.getElementById('compileButton');
-    
-    if (!birthInput || !mobileCTA) return;
-    
-    birthInput.addEventListener('input', function(e) {
-      const digits = e.target.value.replace(/\D/g, '');
-      if (isMobile && digits.length === 8) {
-        mobileCTA.style.display = 'block';
-      } else if (!isMobile || digits.length < 8) {
-        mobileCTA.style.display = 'none';
-      }
+
+
+// Logo click -> open About modal
+const setupLogoClick = () => {
+  const logo = document.querySelector('.brand__name');
+  if (logo && !logo.hasAttribute('data-about-setup')) {
+    logo.setAttribute('data-about-setup', 'true');
+    logo.style.cursor = 'pointer';
+    logo.addEventListener('click', function() {
+      window.openAbout();
     });
-    
-    if (compileButton) {
-      compileButton.addEventListener('click', function() {
-        const event = new KeyboardEvent('keydown', {
-          key: 'Enter',
-          code: 'Enter',
-          keyCode: 13,
-          which: 13,
-          bubbles: true
-        });
-        birthInput.dispatchEvent(event);
-      });
-    }
-  };
+  }
+};
+
+setupLogoClick();
+document.addEventListener('DOMContentLoaded', setupLogoClick);
+const logoObserver = new MutationObserver(setupLogoClick);
+logoObserver.observe(document.body, { childList: true, subtree: true });
+
+// Mobile CTA Button logic - with MutationObserver for React timing
+const isMobileDevice = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+let ctaSetupDone = false;
+
+const setupMobileCTA = () => {
+  if (ctaSetupDone) return;
   
-  checkAndShowButton();
-});
+  const birthInput = document.querySelector('input[placeholder="YYYY / MM / DD"]');
+  const mobileCTA = document.getElementById('mobileCTA');
+  const compileButton = document.getElementById('compileButton');
+  
+  if (!birthInput || !mobileCTA) return;
+  
+  ctaSetupDone = true;
+  
+  birthInput.addEventListener('input', function(e) {
+    const digits = e.target.value.replace(/\D/g, '');
+    if (isMobileDevice && digits.length === 8) {
+      mobileCTA.style.display = 'block';
+    } else if (!isMobileDevice || digits.length < 8) {
+      mobileCTA.style.display = 'none';
+    }
+  });
+  
+  if (compileButton) {
+    compileButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      const event = new KeyboardEvent('keydown', {
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 13,
+        which: 13,
+        bubbles: true
+      });
+      birthInput.dispatchEvent(event);
+    });
+  }
+};
+
+// Try setup immediately and after DOM changes
+setupMobileCTA();
+document.addEventListener('DOMContentLoaded', setupMobileCTA);
+const observer = new MutationObserver(setupMobileCTA);
+observer.observe(document.body, { childList: true, subtree: true });
 </script>
 <footer>
-  <span onclick="openAbout()">about codices</span>
+  <!-- About link moved to logo click in header -->
 </footer>
 </body>
 </html>
