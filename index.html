@@ -1447,9 +1447,30 @@
   .reading-v2__card.is-docked .reading-v2__card-float {
     animation: cardFloat 4s ease-in-out infinite;
   }
+  
+  @media (max-width: 768px) {
+    .reading-v2__card.is-docked {
+      animation: cardGlow 2s ease-in-out infinite;
+    }
+  }
   @keyframes cardFloat {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-4px); }
+  }
+  
+  @keyframes cardGlow {
+    0% {
+      box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.7),
+                  0 0 0 0 rgba(201, 169, 97, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(201, 169, 97, 0),
+                  0 0 0 16px rgba(201, 169, 97, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 8px rgba(201, 169, 97, 0),
+                  0 0 0 16px rgba(201, 169, 97, 0);
+    }
   }
   .reading-v2__hint {
     position: fixed;
@@ -3248,7 +3269,7 @@ function Reading({ onBack, card }) {
   let transform;
   if (isMobile) {
     const moveY = -(vh / 2 - 80) * cardP;
-    const moveX = 20 * cardP;
+    const moveX = 35 * cardP;
     const scaleV = 1 - 0.6 * cardP;
     const rotate = 12 * cardP;
     transform =
