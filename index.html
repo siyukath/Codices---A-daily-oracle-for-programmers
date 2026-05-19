@@ -3920,133 +3920,118 @@ function ShareModal({ card, cosmic, onClose }) {
   const shareNode = cardRef.current.querySelector(".share-card") || cardRef.current;
   setStatus("working");
 
-  // ── Fallback 1: html-to-image not loaded → tell user how to save manually
   if (!window.htmlToImage) {
     console.error("html-to-image library not loaded");
     setStatus("error");
-    alert("Download library failed to load. Try refreshing, or screenshot the card manually.");
+    alert("Download library failed to load. Try refreshing.");
     return;
   }
 
   try {
-    // ── Preload all images to base64 to avoid CORS taint
+    // ── Step 1: Preload all images in the share card
     const imgs = Array.from(shareNode.querySelectorAll("img"));
-    console.log("Found", imgs.length, "images to preload");
+    console.log("Preloading", imgs.length, "images...");
     
-    for (const im of imgs) {
-      if (!im.src) continue; // Skip empty src
-      
-      // Already data URL? skip
-      if (im.src.startsWith("data:")) {
-        console.log("Image already data URL, skipping:", im.src.substring(0, 50));
-        continue;
-      }
+    for (const img of imgs) {
+      if (!img.src || img.src.startsWith("data:")) continue;
       
       try {
-        console.log("Preloading image:", im.src);
-        
-        // Fetch the image and convert to data URL
-        const response = await fetch(im.src, { mode: "cors", credentials: "omit" });
-        if (!response.ok) {
-          console.warn("Fetch failed for:", im.src, "status:", response.status);
-          continue;
-        }
-        
+        console.log("Loading:", img.src);
+        const response = await fetch(img.src, { mode: "no-cors" });
         const blob = await response.blob();
-        const reader = new FileReader();
         
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            im.src = reader.result; // Set image to data URL
-            console.log("Image converted to data URL");
-            resolve();
-          };
+        // Convert blob to data URL
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
+        
+        // Replace image src with data URL
+        img.src = dataUrl;
+        console.log("Image loaded successfully");
       } catch (err) {
-        console.warn("Image preload error (will skip):", im.src, err.message);
-        // Continue anyway - image might still render
+        console.warn("Could not preload image:", img.src, err.message);
+        // Don't fail - continue without this image
       }
     }
-    
-    console.log("Image preloading complete")
 
+    // ── Step 2: Render to PNG with html-to-image
+    console.log("Rendering card to PNG...");
+    
     const opts = {
       width: 1080,
       height: 1620,
       pixelRatio: 1,
       backgroundColor: "#0A0A0A",
-      cacheBust: true,
+      cache: { maxAge: 60 * 60 * 24 }, // Cache for 1 day
       skipFonts: false,
-      style: {
-        transform: "none",
-        margin: "0",
-        padding: "0",
-      },
-      allowTaint: true, // Allow tainted images
-      useCORS: false,   // Disable CORS checking
+      skipAutoScale: false,
+      allowTaint: true,
+      useCORS: true,
     };
 
-    const filename =
-      "codices-" + card.id + "-" +
-      card.name_traditional.replace(/\s+/g, "-") + ".png";
-
-    let blob = null;
-
-    // Try toBlob first
-    if (window.htmlToImage.toBlob) {
-      try {
-        blob = await window.htmlToImage.toBlob(shareNode, opts);
-      } catch (err) {
-        console.warn("toBlob failed, will try toPng fallback:", err);
+    let png;
+    try {
+      // Try toPng first (usually more reliable than toBlob)
+      png = await window.htmlToImage.toPng(shareNode, opts);
+      console.log("PNG generated successfully");
+    } catch (err) {
+      console.warn("toPng failed:", err.message);
+      // Try toDom or toJpeg as fallback
+      if (window.htmlToImage.toJpeg) {
+        png = await window.htmlToImage.toJpeg(shareNode, { ...opts, quality: 0.95 });
+        console.log("JPEG generated as fallback");
+      } else {
+        throw err;
       }
     }
 
-    // Fallback: toPng → dataURL → Blob
-    if (!blob) {
-      const dataUrl = await window.htmlToImage.toPng(shareNode, opts);
-      // Convert dataURL to blob for cleaner download
-      const res = await fetch(dataUrl);
-      blob = await res.blob();
-    }
+    if (!png) throw new Error("PNG generation failed");
 
-    if (!blob) throw new Error("All capture methods failed");
+    // ── Step 3: Download the PNG
+    const filename = "codices-" + card.id + "-" + card.name_traditional.replace(/\s+/g, "-") + ".png";
+    
+    // Convert data URL to blob
+    const response = await fetch(png);
+    const blob = await response.blob();
 
-    // ── Mobile-friendly download path
-    const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
-
-    if (isMobile && navigator.share && navigator.canShare) {
-      // On iOS Safari, downloads via <a download> often don't work;
-      // use the Web Share API to let user save to Photos or share.
-      const file = new File([blob], filename, { type: "image/png" });
-      if (navigator.canShare({ files: [file] })) {
-        try {
+    // Use Web Share API on mobile, regular download on desktop
+    const isMobileDevice = /iPhone|iPad|Android|webOS/i.test(navigator.userAgent);
+    
+    if (isMobileDevice && navigator.share) {
+      try {
+        const file = new File([blob], filename, { type: "image/png" });
+        if (navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], title: "codices" });
           setStatus("idle");
           return;
-        } catch (err) {
-          // User canceled or share failed — fall through to <a> download
-          if (err.name !== "AbortError") console.warn("share failed:", err);
         }
+      } catch (err) {
+        console.warn("Share API failed:", err.message);
+        // Fall through to regular download
       }
     }
 
-    // ── Standard download path
+    // Regular download
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.download = filename;
     link.href = url;
+    link.download = filename;
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 100);
 
     setStatus("idle");
-  } catch (e) {
-    console.error("share download failed:", e);
+  } catch (err) {
+    console.error("Download failed:", err);
     setStatus("error");
+    alert("Download failed. Try again or take a screenshot.");
   }
 };
 
