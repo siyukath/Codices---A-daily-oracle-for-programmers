@@ -869,16 +869,47 @@
     color: var(--dimmer);
   }
 
-  .landing__enter-hint {
-    opacity: 0;
+  .landing__enter-button {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--dim);
+    background: transparent;
+    border: 1px solid var(--hairline);
+    cursor: pointer;
+    padding: 8px 12px;
+    letter-spacing: 0.06em;
+    transition: all 200ms ease-out;
     animation: enterPulse 1.5s ease-in-out infinite;
+  }
+  
+  .landing__enter-button:hover {
     color: #C9A961;
-    font-size: 12px;
+    border-color: #C9A961;
+    box-shadow: 0 0 12px rgba(201, 169, 97, 0.2);
+  }
+  
+  .landing__enter-button.active {
+    color: #C9A961;
+    border-color: #C9A961;
+    animation: enterArrowFlow 0.8s ease-in-out infinite;
   }
   
   @keyframes enterPulse {
-    0%, 100% { opacity: 0.4; }
+    0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
+  }
+  
+  @keyframes enterArrowFlow {
+    0%, 100% {
+      color: #C9A961;
+      box-shadow: 0 0 8px rgba(201, 169, 97, 0.3);
+      transform: translateX(0);
+    }
+    50% {
+      color: #FFE066;
+      box-shadow: 0 0 16px rgba(201, 169, 97, 0.5);
+      transform: translateX(2px);
+    }
   }
 
   /* ─── Screen 2: Compile + Circuit Oracle (synchronized) ─── */
@@ -1464,24 +1495,24 @@
   .reading-v2__card-float { display: block; }
   
   .reading-v2__card.is-docked .reading-v2__card-float {
-    animation: cardFloat 4s ease-in-out infinite;
+    animation: cardFloat 2.5s ease-in-out infinite;
   }
   
   @media (max-width: 768px) {
     .reading-v2__card.is-docked {
-      animation: cardRippleMobile 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+      animation: cardRippleMobile 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
     }
   }
   
   @keyframes cardRippleMobile {
     0% {
-      box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.3);
+      box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.4);
     }
     50% {
-      box-shadow: 0 0 0 12px rgba(201, 169, 97, 0.08);
+      box-shadow: 0 0 0 8px rgba(201, 169, 97, 0.1);
     }
     100% {
-      box-shadow: 0 0 0 24px rgba(201, 169, 97, 0);
+      box-shadow: 0 0 0 16px rgba(201, 169, 97, 0);
     }
   }
   @keyframes cardFloat {
@@ -2200,7 +2231,7 @@
   color: #C9A961;
 }
 .sc__birthday-text {
-  font-size: 22px;
+  font-size: 32px;
 }
 /* ─── COMPILE LOG EASTER EGGS ───────────────────────────────── */
 .compile__log-line--easter {
@@ -2824,9 +2855,14 @@ function Landing({ onSubmit,cosmic }) {
           <div className="landing__error">{error}</div>
           <div className="landing__hint">
             // press enter to continue
-            <span className="landing__enter-hint" id="enterHint" style={{display: 'none'}}>
-              <span style={{marginLeft: '8px'}}>↵ →</span>
-            </span>
+            <button 
+              id="enterButton" 
+              className="landing__enter-button"
+              style={{display: 'none'}}
+              onClick={() => handleEnterSubmit && handleEnterSubmit()}
+            >
+              ↵ →
+            </button>
           </div>
         </div>
       </div>
@@ -3876,40 +3912,62 @@ function ShareModal({ card, cosmic, onClose }) {
       // Already data URL? skip
       if (im.src.startsWith("data:")) return;
       
-      try {
-        const response = await fetch(im.src, { mode: "no-cors" });
-        if (!response.ok && !im.src.startsWith("assets/")) {
-          console.warn("image fetch failed:", im.src);
-          return;
-        }
-        
-        const blob = await response.blob();
-        const reader = new FileReader();
-        
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            try {
-              im.src = reader.result;
-              // Force re-render by triggering onload
-              setTimeout(resolve, 50);
-            } catch (e) {
-              reject(e);
+      // For local assets, fetch normally
+      // For remote, use canvas-based conversion to avoid CORS
+      if (im.src.startsWith("assets/") || im.src.startsWith("/")) {
+        try {
+          const response = await fetch(im.src);
+          if (!response.ok) {
+            console.warn("local fetch failed:", im.src);
+            return;
+          }
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          im.src = url;
+          
+          // Wait briefly for image to load with new src
+          await new Promise((resolve) => {
+            if (im.complete) {
+              setTimeout(resolve, 10);
+            } else {
+              im.onload = resolve;
+              im.onerror = resolve;
             }
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      } catch (err) {
-        console.warn("image preload error (will continue):", im.src, err.message);
-        // Continue anyway - html-to-image might still work
+          });
+        } catch (err) {
+          console.warn("local image fetch error:", im.src, err.message);
+        }
+      } else {
+        // Remote images: use canvas to convert
+        try {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          
+          // Create a temporary image to test loading
+          const testImg = new Image();
+          testImg.crossOrigin = "anonymous";
+          testImg.src = im.src;
+          
+          await new Promise((resolve, reject) => {
+            testImg.onload = resolve;
+            testImg.onerror = () => reject(new Error("image load failed"));
+          });
+          
+          canvas.width = testImg.width;
+          canvas.height = testImg.height;
+          ctx.drawImage(testImg, 0, 0);
+          
+          im.src = canvas.toDataURL("image/png");
+          setTimeout(() => resolve(), 10);
+        } catch (err) {
+          console.warn("remote image conversion failed:", im.src, err.message);
+          // Leave original src - html-to-image might handle it with allowTaint
+        }
       }
     });
     
-    try {
-      await Promise.all(imgPromises);
-    } catch (e) {
-      console.warn("some images failed to preload:", e);
-    }
+    // Wait for all images to preload, but don't block if any fail
+    await Promise.allSettled(imgPromises);
 
     const opts = {
       width: 1080,
@@ -4358,18 +4416,45 @@ const setupEnterHint = () => {
   if (enterHintSetupDone) return;
   
   const birthInput = document.querySelector('input[placeholder="YYYY / MM / DD"]');
-  const enterHint = document.getElementById('enterHint');
+  const enterButton = document.getElementById('enterButton');
   
-  if (!birthInput || !enterHint) return;
+  if (!birthInput || !enterButton) return;
   
   enterHintSetupDone = true;
+  
+  // 设置全局 handleEnterSubmit 函数供按钮使用
+  window.handleEnterSubmit = function() {
+    birthInput.dispatchEvent(new Event('keypress', { key: 'Enter', code: 'Enter' }));
+    // 触发 Enter 键提交逻辑
+    if (birthInput.form) {
+      birthInput.form.dispatchEvent(new Event('submit'));
+    }
+  };
   
   birthInput.addEventListener('input', function(e) {
     const digits = e.target.value.replace(/\D/g, '');
     if (isMobileDevice && digits.length === 8) {
-      enterHint.style.display = 'inline';
+      enterButton.style.display = 'inline-block';
+      enterButton.classList.add('active');
     } else if (!isMobileDevice || digits.length < 8) {
-      enterHint.style.display = 'none';
+      enterButton.style.display = 'none';
+      enterButton.classList.remove('active');
+    }
+  });
+  
+  // 点击按钮或按 Enter 键都能提交
+  enterButton.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.handleEnterSubmit();
+  });
+  
+  birthInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const digits = e.target.value.replace(/\D/g, '');
+      if (digits.length === 8) {
+        e.preventDefault();
+        window.handleEnterSubmit();
+      }
     }
   });
 };
