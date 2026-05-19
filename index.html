@@ -1436,10 +1436,10 @@
   }
   .reading-v2__card {
     position: fixed;
-    top: 24px;
+    top: 45%;
     left: 50%;
     z-index: 3;
-    transform-origin: top center;
+    transform-origin: center;
     will-change: transform;
     pointer-events: auto;
   }
@@ -1454,8 +1454,8 @@
   .reading-v2__hint {
     position: fixed;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: calc(50% + 33vh);
+    transform: translateX(-50%);
     font-family: var(--mono);
     font-size: 13px;
     color: var(--dim);
@@ -1475,9 +1475,9 @@
     50%      { transform: translateY(3px); }
   }
   .reading-v2__scroll {
-    /* Top spacer keeps content below the fixed card.
-       Centered layout for better readability. */
-    padding: 340px 10% 200px 10%;
+    /* 100vh top spacer keeps the initial state empty around the card.
+       Left padding leaves room for the docked card at ~25vw. */
+    padding: 100vh 10% 200px 50vw;
     position: relative;
   }
   .reading-v2__content {
@@ -1495,8 +1495,8 @@
   }
 
   @media (max-width: 860px) {
-    .reading-v2__scroll { padding: 320px 24px 220px; }
-    .reading-v2__hint   { top: 50%; }
+    .reading-v2__scroll { padding: 90vh 24px 220px; }
+    .reading-v2__hint   { top: calc(50% + 28vh); }
   }
   .reading__left {
     display: flex;
@@ -3239,10 +3239,26 @@ function Reading({ onBack, card }) {
   const docked = cardP >= 0.95;
   const isMobile = vw < 768;
 
-  // Card scales down as user scrolls. transform-origin is now top center.
-  // No lateral movement needed; content flows below the card.
-  const scaleV = 1 - 0.6 * cardP;
-  const transform = "translate(-50%, 0) scale(" + scaleV + ")";
+  // Mobile: card moves UP from center to near the top, scales to 0.4,
+  // no rotation. Desktop: card moves LEFT to ~25vw, scales 0.5, rotates -3.
+  let transform;
+  if (isMobile) {
+    const moveY = -(vh / 2 - 80) * cardP;
+    const scaleV = 1 - 0.6 * cardP;
+    transform =
+    "translate(-50%, -50%) " +
+    "translate(0, " + moveY + "px) " +
+    "scale(" + scaleV + ")";
+  } else {
+    const moveX = -25 * cardP;
+    const scaleV = 1 - 0.5 * cardP;
+    const rotate = -3 * cardP;
+    transform =
+    "translate(-50%, -50%) " +
+    "translateX(" + moveX + "vw) " +
+    "scale(" + scaleV + ") " +
+    "rotate(" + rotate + "deg)";
+  }
 
   // Card size: ~380×590 desktop baseline, height-clamped on mobile.
   let cardH, cardW;
