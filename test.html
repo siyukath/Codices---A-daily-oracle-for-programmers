@@ -1469,27 +1469,48 @@
   
   @media (max-width: 768px) {
     .reading-v2__card.is-docked {
-      animation: cardRippleMobile 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
-    }
+    position: relative;
   }
-  
-  @keyframes cardRippleMobile {
-    0% {
-      box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 0 12px rgba(201, 169, 97, 0.08);
-    }
-    100% {
-      box-shadow: 0 0 0 24px rgba(201, 169, 97, 0);
-    }
+  .reading-v2__card.is-docked::before,
+  .reading-v2__card.is-docked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid #C9A961;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transform-origin: center;
+    will-change: transform, opacity;
   }
+  .reading-v2__card.is-docked::before {
+    animation: cardRippleSoft 5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  }
+  .reading-v2__card.is-docked::after {
+    animation: cardRippleSoft 5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+    animation-delay: 1.7s; /* second ripple chases the first */
+  }
+}
   @keyframes cardFloat {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-4px); }
   }
   
-
+  @keyframes cardRippleSoft {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+    border-width: 1px;
+  }
+  15% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(1.18);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
   .reading-v2__hint {
     position: fixed;
     left: 50%;
@@ -3869,62 +3890,48 @@ function ShareModal({ card, cosmic, onClose }) {
 
   try {
     // ── Preload all images to base64 to avoid CORS taint
+    // This is the #1 reason html-to-image fails: images from a different
+    // origin (e.g. Vercel's CDN) taint the canvas. Convert them to inline
+    // base64 first so the canvas stays clean.
     const imgs = Array.from(shareNode.querySelectorAll("img"));
-    const imgPromises = imgs.map(async (im) => {
-      if (!im.src) return; // Skip empty src
-      
-      // Already data URL? skip
-      if (im.src.startsWith("data:")) return;
-      
+    await Promise.all(imgs.map(async (im) => {
+      // Already loaded? skip.
+      if (im.complete && im.naturalWidth > 0 && im.src.startsWith("data:")) return;
+
       try {
-        const response = await fetch(im.src, { mode: "no-cors" });
-        if (!response.ok && !im.src.startsWith("assets/")) {
-          console.warn("image fetch failed:", im.src);
-          return;
-        }
-        
+        const response = await fetch(im.src, { mode: "cors", cache: "no-cache" });
         const blob = await response.blob();
-        const reader = new FileReader();
-        
-        await new Promise((resolve, reject) => {
-          reader.onload = () => {
-            try {
-              im.src = reader.result;
-              // Force re-render by triggering onload
-              setTimeout(resolve, 50);
-            } catch (e) {
-              reject(e);
-            }
-          };
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
+        im.src = dataUrl;
+        // Wait for the new src to load
+        await new Promise((resolve) => {
+          if (im.complete) resolve();
+          else {
+            im.onload = resolve;
+            im.onerror = resolve;
+          }
+        });
       } catch (err) {
-        console.warn("image preload error (will continue):", im.src, err.message);
-        // Continue anyway - html-to-image might still work
+        console.warn("preload image failed (will continue):", im.src, err);
       }
-    });
-    
-    try {
-      await Promise.all(imgPromises);
-    } catch (e) {
-      console.warn("some images failed to preload:", e);
-    }
+    }));
 
     const opts = {
       width: 1080,
       height: 1620,
       pixelRatio: 1,
       backgroundColor: "#0A0A0A",
-      cacheBust: true,
+      cacheBust: false, // turned off — we already pre-fetched
       skipFonts: false,
       style: {
         transform: "none",
         margin: "0",
-        padding: "0",
       },
-      allowTaint: true, // Allow tainted images
-      useCORS: false,   // Disable CORS checking
     };
 
     const filename =
