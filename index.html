@@ -2786,6 +2786,9 @@ function Landing({ onSubmit,cosmic }) {
   const [showButton, setShowButton] = useState(false);
   const inputRef = useRef(null);
   const buttonRef = useRef(null);
+  
+  // Local mobile detection
+  const isMobile = () => /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   useEffect(() => {inputRef.current && inputRef.current.focus();}, []);
 
@@ -2816,7 +2819,7 @@ function Landing({ onSubmit,cosmic }) {
     
     // Show button only on mobile when 8 digits entered
     const digits = formatted.replace(/\D/g, "");
-    if (isMobileDevice && digits.length === 8) {
+    if (isMobile() && digits.length === 8) {
       setShowButton(true);
     } else {
       setShowButton(false);
@@ -3651,7 +3654,8 @@ function Reading({ onBack, card, cosmic }) {
     cardW = Math.min(vw * 0.75, vh * 0.55 * 380 / 590);
     cardH = cardW * 590 / 380;
   } else {
-    cardH = Math.max(540, Math.min(590, Math.round(vh * 0.72)));
+    // Desktop: larger card for better clarity - up to 80% of viewport height
+    cardH = Math.max(560, Math.min(620, Math.round(vh * 0.80)));
     cardW = Math.round(cardH * 380 / 590);
   }
 
@@ -3927,68 +3931,46 @@ function ShareModal({ card, cosmic, onClose }) {
   try {
     // ── Preload all images to base64 to avoid CORS taint
     const imgs = Array.from(shareNode.querySelectorAll("img"));
-    const imgPromises = imgs.map(async (im) => {
-      if (!im.src) return; // Skip empty src
+    console.log("Found", imgs.length, "images to preload");
+    
+    for (const im of imgs) {
+      if (!im.src) continue; // Skip empty src
       
       // Already data URL? skip
-      if (im.src.startsWith("data:")) return;
-      
-      // For local assets, fetch normally
-      // For remote, use canvas-based conversion to avoid CORS
-      if (im.src.startsWith("assets/") || im.src.startsWith("/")) {
-        try {
-          const response = await fetch(im.src);
-          if (!response.ok) {
-            console.warn("local fetch failed:", im.src);
-            return;
-          }
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          im.src = url;
-          
-          // Wait briefly for image to load with new src
-          await new Promise((resolve) => {
-            if (im.complete) {
-              setTimeout(resolve, 10);
-            } else {
-              im.onload = resolve;
-              im.onerror = resolve;
-            }
-          });
-        } catch (err) {
-          console.warn("local image fetch error:", im.src, err.message);
-        }
-      } else {
-        // Remote images: use canvas to convert
-        try {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          
-          // Create a temporary image to test loading
-          const testImg = new Image();
-          testImg.crossOrigin = "anonymous";
-          testImg.src = im.src;
-          
-          await new Promise((resolve, reject) => {
-            testImg.onload = resolve;
-            testImg.onerror = () => reject(new Error("image load failed"));
-          });
-          
-          canvas.width = testImg.width;
-          canvas.height = testImg.height;
-          ctx.drawImage(testImg, 0, 0);
-          
-          im.src = canvas.toDataURL("image/png");
-          setTimeout(() => resolve(), 10);
-        } catch (err) {
-          console.warn("remote image conversion failed:", im.src, err.message);
-          // Leave original src - html-to-image might handle it with allowTaint
-        }
+      if (im.src.startsWith("data:")) {
+        console.log("Image already data URL, skipping:", im.src.substring(0, 50));
+        continue;
       }
-    });
+      
+      try {
+        console.log("Preloading image:", im.src);
+        
+        // Fetch the image and convert to data URL
+        const response = await fetch(im.src, { mode: "cors", credentials: "omit" });
+        if (!response.ok) {
+          console.warn("Fetch failed for:", im.src, "status:", response.status);
+          continue;
+        }
+        
+        const blob = await response.blob();
+        const reader = new FileReader();
+        
+        await new Promise((resolve, reject) => {
+          reader.onload = () => {
+            im.src = reader.result; // Set image to data URL
+            console.log("Image converted to data URL");
+            resolve();
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (err) {
+        console.warn("Image preload error (will skip):", im.src, err.message);
+        // Continue anyway - image might still render
+      }
+    }
     
-    // Wait for all images to preload, but don't block if any fail
-    await Promise.allSettled(imgPromises);
+    console.log("Image preloading complete")
 
     const opts = {
       width: 1080,
