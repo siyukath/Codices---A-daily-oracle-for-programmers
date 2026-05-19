@@ -1500,19 +1500,40 @@
   
   @media (max-width: 768px) {
     .reading-v2__card.is-docked {
-      animation: cardRippleMobile 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+      animation: cardRippleMobile 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
     }
   }
   
   @keyframes cardRippleMobile {
     0% {
-      box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.4);
+      box-shadow: 
+        0 0 0 0 rgba(201, 169, 97, 0.5),
+        0 0 0 0 rgba(201, 169, 97, 0),
+        0 0 0 0 rgba(201, 169, 97, 0);
+    }
+    25% {
+      box-shadow: 
+        0 0 0 6px rgba(201, 169, 97, 0.3),
+        0 0 0 0 rgba(201, 169, 97, 0),
+        0 0 0 0 rgba(201, 169, 97, 0);
     }
     50% {
-      box-shadow: 0 0 0 8px rgba(201, 169, 97, 0.1);
+      box-shadow: 
+        0 0 0 12px rgba(201, 169, 97, 0.1),
+        0 0 0 6px rgba(201, 169, 97, 0.25),
+        0 0 0 0 rgba(201, 169, 97, 0);
+    }
+    75% {
+      box-shadow: 
+        0 0 0 18px rgba(201, 169, 97, 0.05),
+        0 0 0 12px rgba(201, 169, 97, 0.1),
+        0 0 0 6px rgba(201, 169, 97, 0.2);
     }
     100% {
-      box-shadow: 0 0 0 16px rgba(201, 169, 97, 0);
+      box-shadow: 
+        0 0 0 24px rgba(201, 169, 97, 0),
+        0 0 0 18px rgba(201, 169, 97, 0),
+        0 0 0 12px rgba(201, 169, 97, 0);
     }
   }
   @keyframes cardFloat {
@@ -2920,7 +2941,7 @@ const LOG_LINES = [
 { t: 3.8, lhs: "> card resolved: %ROMAN%", rhs: "" },
 { t: 4.0, lhs: "> %TITLE%", rhs: "", hi: true }];
 
-const LOG_CPS = 30;
+const LOG_CPS = 15;  // Slower typing for better readability
 const LOG_LHS_WIDTH = 36;
 
 // ─── Circuit Oracle geometry ────────────────────────────────────────
@@ -3639,7 +3660,7 @@ function Reading({ onBack, card, cosmic }) {
     "rotate(" + rotate + "deg)";
   } else {
     const moveX = -25 * cardP;
-    const scaleV = 1 - 0.5 * cardP;
+    const scaleV = 1 - 0.35 * cardP;  // Docked card is larger (0.65 at cardP=1 instead of 0.5)
     const rotate = -3 * cardP;
     transform =
     "translate(-50%, -50%) " +
