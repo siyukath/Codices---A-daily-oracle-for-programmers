@@ -863,6 +863,42 @@
     color: var(--dimmer);
   }
 
+  .mobile-cta-container {
+    margin-top: 32px;
+    text-align: center;
+  }
+
+  .cta-button {
+    background: transparent;
+    border: 1px solid #C9A961;
+    color: #EDEDED;
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    padding: 16px 40px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cta-button:hover {
+    border-color: #EDEDED;
+    background-color: rgba(201, 169, 97, 0.05);
+    box-shadow: 0 0 20px rgba(201, 169, 97, 0.1);
+  }
+
+  .cta-button:active {
+    transform: scale(0.98);
+  }
+
+  .cta-hint {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 12px;
+    letter-spacing: 0.05em;
+  }
+
   /* ─── Screen 2: Compile + Circuit Oracle (synchronized) ─── */
   .compile {
     min-height: 100vh;
@@ -2692,6 +2728,15 @@ function Landing({ onSubmit }) {
           </div>
           <div className="landing__error">{error}</div>
           <div className="landing__hint">// press enter to continue</div>
+          
+          <div className="mobile-cta-container" id="mobileCTA" style={{display: 'none'}}>
+            <button className="cta-button" id="compileButton">
+              compile your fate →
+            </button>
+            <div className="cta-hint">
+              // press to begin
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3896,7 +3941,87 @@ function App() {
 
 }
 
+// About Modal Component
+function AboutModal() {
+  return (
+    <div id="aboutModal" className="modal" style={{display: 'none'}}>
+      <div className="modal-backdrop" onClick={() => window.closeAbout()}></div>
+      <div className="modal-content">
+        <button className="modal-close" onClick={() => window.closeAbout()}>← back</button>
+        <h2>about codices</h2>
+        <div className="about-section">
+          <h3>concept</h3>
+          <p>Codices is a daily programmer tarot oracle that combines Beardsley aesthetics, Wilde's wit, and actual cosmic data to generate non-random card draws. Each reading is uniquely determined by your birth timestamp, today's date, the moon phase, your timezone, and Julian date — ensuring that no two people on the same day get the same card, and you never get the same card twice in a single day.</p>
+        </div>
+        <div className="about-section">
+          <h3>design</h3>
+          <p>Visual system: Aubrey Beardsley line art + Unix terminal aesthetics. Every card is hand-written in the voice of Oscar Wilde — using beautiful sentences to deliver concrete, actionable advice for developers. No emojis. No artificial encouragement. Just the oracle.</p>
+        </div>
+        <div className="about-section">
+          <h3>the algorithm</h3>
+          <p>Your card is determined by a SHA-256 hash of: your birth date, today's date, the moon phase, your timezone, and the Julian date. This is not random. It is deterministic, verifiable, and cosmic.</p>
+        </div>
+        <div className="about-section">
+          <h3>built by</h3>
+          <p>Siyu Zhong — product designer & developer<br/>Typefaces: Cormorant Garamond + JetBrains Mono<br/>Illustration: Aubrey Beardsley (via nano banana / Gemini)<br/>Hosted on Vercel</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+// Global About Modal functions
+window.openAbout = function() {
+  const modal = document.getElementById('aboutModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeAbout = function() {
+  const modal = document.getElementById('aboutModal');
+  if (modal) modal.style.display = 'none';
+};
+
+// Mobile CTA Button logic
+document.addEventListener('DOMContentLoaded', function() {
+  const isMobile = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  const checkAndShowButton = () => {
+    const birthInput = document.querySelector('.landing__input');
+    const mobileCTA = document.getElementById('mobileCTA');
+    const compileButton = document.getElementById('compileButton');
+    
+    if (!birthInput || !mobileCTA) return;
+    
+    birthInput.addEventListener('input', function(e) {
+      const digits = e.target.value.replace(/\D/g, '');
+      if (isMobile && digits.length === 8) {
+        mobileCTA.style.display = 'block';
+      } else if (!isMobile || digits.length < 8) {
+        mobileCTA.style.display = 'none';
+      }
+    });
+    
+    if (compileButton) {
+      compileButton.addEventListener('click', function() {
+        const event = new KeyboardEvent('keydown', {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          which: 13,
+          bubbles: true
+        });
+        birthInput.dispatchEvent(event);
+      });
+    }
+  };
+  
+  checkAndShowButton();
+});
 </script>
+<footer>
+  <span onclick="openAbout()">about codices</span>
+</footer>
 </body>
 </html>
