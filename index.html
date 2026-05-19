@@ -2783,7 +2783,9 @@ function getSubtitle(cosmic) {
 function Landing({ onSubmit,cosmic }) {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  const [showButton, setShowButton] = useState(false);
   const inputRef = useRef(null);
+  const buttonRef = useRef(null);
 
   useEffect(() => {inputRef.current && inputRef.current.focus();}, []);
 
@@ -2808,8 +2810,17 @@ function Landing({ onSubmit,cosmic }) {
   };
 
   const handleChange = (e) => {
-    setValue(formatBirth(e.target.value));
+    const formatted = formatBirth(e.target.value);
+    setValue(formatted);
     if (error) setError("");
+    
+    // Show button only on mobile when 8 digits entered
+    const digits = formatted.replace(/\D/g, "");
+    if (isMobileDevice && digits.length === 8) {
+      setShowButton(true);
+    } else {
+      setShowButton(false);
+    }
   };
 
   const handleKey = (e) => {
@@ -2821,6 +2832,16 @@ function Landing({ onSubmit,cosmic }) {
       } else {
         setError("// invalid timestamp — 8 digits, YYYYMMDD");
       }
+    }
+  };
+
+  const handleButtonClick = () => {
+    const dt = validate(value);
+    if (dt) {
+      setError("");
+      onSubmit(dt);
+    } else {
+      setError("// invalid timestamp — 8 digits, YYYYMMDD");
     }
   };
 
@@ -2856,10 +2877,10 @@ function Landing({ onSubmit,cosmic }) {
           <div className="landing__hint">
             // press enter to continue
             <button 
-              id="enterButton" 
+              ref={buttonRef}
               className="landing__enter-button"
-              style={{display: 'none'}}
-              onClick={() => handleEnterSubmit && handleEnterSubmit()}
+              style={{display: showButton ? 'inline-block' : 'none'}}
+              onClick={handleButtonClick}
             >
               ↵ →
             </button>
@@ -4410,59 +4431,7 @@ logoObserver.observe(document.body, { childList: true, subtree: true });
 
 // Mobile enter hint - show when 8 digits entered
 const isMobileDevice = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-let enterHintSetupDone = false;
 
-const setupEnterHint = () => {
-  if (enterHintSetupDone) return;
-  
-  const birthInput = document.querySelector('input[placeholder="YYYY / MM / DD"]');
-  const enterButton = document.getElementById('enterButton');
-  
-  if (!birthInput || !enterButton) return;
-  
-  enterHintSetupDone = true;
-  
-  // 设置全局 handleEnterSubmit 函数供按钮使用
-  window.handleEnterSubmit = function() {
-    birthInput.dispatchEvent(new Event('keypress', { key: 'Enter', code: 'Enter' }));
-    // 触发 Enter 键提交逻辑
-    if (birthInput.form) {
-      birthInput.form.dispatchEvent(new Event('submit'));
-    }
-  };
-  
-  birthInput.addEventListener('input', function(e) {
-    const digits = e.target.value.replace(/\D/g, '');
-    if (isMobileDevice && digits.length === 8) {
-      enterButton.style.display = 'inline-block';
-      enterButton.classList.add('active');
-    } else if (!isMobileDevice || digits.length < 8) {
-      enterButton.style.display = 'none';
-      enterButton.classList.remove('active');
-    }
-  });
-  
-  // 点击按钮或按 Enter 键都能提交
-  enterButton.addEventListener('click', function(e) {
-    e.preventDefault();
-    window.handleEnterSubmit();
-  });
-  
-  birthInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      const digits = e.target.value.replace(/\D/g, '');
-      if (digits.length === 8) {
-        e.preventDefault();
-        window.handleEnterSubmit();
-      }
-    }
-  });
-};
-
-setupEnterHint();
-document.addEventListener('DOMContentLoaded', setupEnterHint);
-const hintObserver = new MutationObserver(setupEnterHint);
-hintObserver.observe(document.body, { childList: true, subtree: true });
 </script>
 <footer>
   <!-- About link moved to logo click in header -->
