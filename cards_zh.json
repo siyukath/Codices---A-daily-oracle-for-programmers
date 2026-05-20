@@ -1,0 +1,668 @@
+{
+  "cards": [
+    {
+      "id": "00",
+      "roman": "0",
+      "name_traditional": "愚者",
+      "name_codex": "// hello world",
+      "name_technical": "fool.init()",
+      "illustration_path": "assets/00-fool.png",
+      "reading": {
+        "title": "今天是 hello world 日",
+        "body": "你又开了个新项目。\n也许这次不一样。\n你心里清楚不会。\n但你还是会开。\n人就是这样维持希望的。"
+      },
+      "do_list": [
+        "开新 repo（哪怕一周后就放）",
+        "学一个用不上的框架",
+        "init 一切"
+      ],
+      "dont_list": [
+        "在 README立 flag",
+        "跟人说\"这是我做过最棒的\"",
+        "想结局"
+      ],
+      "lucky": {
+        "color": "#F8F8F8",
+        "commit": "feat: initial commit (我有预感)",
+        "time": "14:00 - 16:00",
+        "avoid": "周会",
+        "companion": "XVII 星星（一起做没意义的事的搭子最棒啦）",
+        "color_name": "刚 init 时的纯白"
+      }
+    },
+    {
+      "id": "01",
+      "roman": "I",
+      "name_traditional": "魔术师",
+      "name_codex": "// the engineer",
+      "name_technical": "engineer.build()",
+      "illustration_path": "assets/01-engineer.png",
+      "reading": {
+        "title": "今天是工程师日",
+        "body": "你知道怎么写。\n你知道用什么写。\n你只是不想写。\n但今天得写，因为没人比你更会写。\n有些能力是奖赏，有些是诅咒，你的是后者。"
+      },
+      "do_list": [
+        "把想了三周的功能写完",
+        "偷偷 over-engineer 一个简单需求",
+        "看到自己一年前的烂代码 忍不住重写"
+      ],
+      "dont_list": [
+        "帮别人 debug",
+        "在群里晒成果",
+        "在 standup 说\"差不多了\""
+      ],
+      "lucky": {
+        "color": "#00FF41",
+        "commit": "refactor: cleaner, faster, mine",
+        "time": "心流来的那一刻 别看表",
+        "avoid": "让你 review 别人代码的人",
+        "companion": "IX 隐者（你建他守）",
+        "color_name": "终端绿"
+      }
+    },
+    {
+      "id": "02",
+      "roman": "II",
+      "name_traditional": "女祭司",
+      "name_codex": "// the documentation",
+      "name_technical": "docs.read()",
+      "illustration_path": "assets/02-documentation.png",
+      "reading": {
+        "title": "今天是看文档日",
+        "body": "答案一直在那里。\n你只是没去看。\n你 stack overflow 了三个小时\n才想起来翻一下官方文档。\n知识没有躲你，是你在躲它。"
+      },
+      "do_list": [
+        "把那篇你 mark 了三个月的文档真的读了",
+        "在 README 里写一行你以前会笑的话",
+        "承认你不知道 然后去查"
+      ],
+      "dont_list": [
+        "问 ChatGPT 一个能搜到的问题",
+        "假装看懂了点点头",
+        "对着报错信息发呆超过 10 分钟"
+      ],
+      "lucky": {
+        "color": "#0A84FF",
+        "commit": "docs: clarify what was always there",
+        "time": "卡住之后的第 11 分钟",
+        "avoid": "凭印象写代码",
+        "companion": "XI 正义（一起讲道理的人）",
+        "color_name": "未读邮件的蓝"
+      }
+    },
+    {
+      "id": "03",
+      "roman": "III",
+      "name_traditional": "女皇",
+      "name_codex": "// the mainframe",
+      "name_technical": "mainframe.serve()",
+      "illustration_path": "assets/03-mainframe.png",
+      "reading": {
+        "title": "今天是服务器日",
+        "body": "你不知道她在哪个机房。\n你不知道她长什么样。\n你只知道她每秒都在替你扛着。\n她不抱怨，因为她不能。\n这是当代最沉默的牛马。"
+      },
+      "do_list": [
+        "看一眼监控 道一声谢",
+        "升级一下她的内存",
+        "别再往她身上加新服务了"
+      ],
+      "dont_list": [
+        "下午高峰期重启",
+        "把日志关了图清净",
+        "想着\"应该撑得住\""
+      ],
+      "lucky": {
+        "color": "#00D26A",
+        "commit": "chore: scale up (she deserves it)",
+        "time": "凌晨流量低谷",
+        "avoid": "深夜的 deploy",
+        "companion": "IX 隐者（一起在没人看的地方撑着）",
+        "color_name": "机柜指示灯的绿"
+      }
+    },
+    {
+      "id": "04",
+      "roman": "IV",
+      "name_traditional": "皇帝",
+      "name_codex": "// the architect",
+      "name_technical": "architect.design()",
+      "illustration_path": "assets/04-architect.png",
+      "reading": {
+        "title": "今天是架构师日",
+        "body": "你画了一张图。\n图上每个框你都能讲半小时。\n落地的时候 实习生说\"这里我改一下哈\"\n然后图就没了。\n架构师的悲哀是 没人按图走。"
+      },
+      "do_list": [
+        "在白板上画一张没人会真的看的图",
+        "在文档里写\"future work\"（永远的 future）",
+        "用一个新词命名一个老东西"
+      ],
+      "dont_list": [
+        "真的相信架构会被执行",
+        "回答\"为什么这样设计\"超过两次",
+        "试图阻止重构"
+      ],
+      "lucky": {
+        "color": "#1C1C1E",
+        "commit": "design: this will all change in 6 months",
+        "time": "会议室空着的下午",
+        "avoid": "听到\"快速过一下设计\"",
+        "companion": "XX 审判（一起 review 的老朋友）",
+        "color_name": "白板笔的黑"
+      }
+    },
+    {
+      "id": "05",
+      "roman": "V",
+      "name_traditional": "教皇",
+      "name_codex": "// the onboarding",
+      "name_technical": "onboarding.run()",
+      "illustration_path": "assets/05-onboarding.png",
+      "reading": {
+        "title": "今天是入职培训日",
+        "body": "你被告知\"我们是一家文化很轻松的公司\"。\n你点头。\n你也知道这意味着什么。\n意味着接下来 N 年，你将学会\n什么时候该笑，什么时候该闭嘴，\n什么时候该假装在加班。\n欢迎入职。"
+      },
+      "do_list": [
+        "把所有 onboarding 文档看一遍 然后忘掉",
+        "跟每个人微笑 记住他们的工位号不是名字",
+        "学会公司黑话"
+      ],
+      "dont_list": [
+        "第一周提建议",
+        "在大群里发\"我是新来的\"",
+        "真的相信\"扁平化管理\""
+      ],
+      "lucky": {
+        "color": "#8E8E93",
+        "commit": "docs: my first commit (please don't review too hard)",
+        "time": "午休前最后 10 分钟",
+        "avoid": "HR 让你\"分享一下感受\"",
+        "companion": "IX 隐者（带你的人就是他）",
+        "color_name": "工牌挂绳的灰"
+      }
+    },
+    {
+      "id": "06",
+      "roman": "VI",
+      "name_traditional": "恋人",
+      "name_codex": "// the pairing",
+      "name_technical": "pair.commit()",
+      "illustration_path": "assets/06-pairing.png",
+      "reading": {
+        "title": "今天是结对编程日",
+        "body": "他写一行，你看着。\n你写一行，他看着。\n你们都在尽力假装这是高效的。\n你们都知道单干会更快。\n但有些事一个人做没意思 哪怕慢一点。"
+      },
+      "do_list": [
+        "把键盘交出去 闭嘴五分钟",
+        "假装你也不知道这个 bug 怎么修",
+        "一起骂前任工程师"
+      ],
+      "dont_list": [
+        "抢键盘",
+        "说\"我来吧\"超过两次",
+        "心里默默重写他写的每一行"
+      ],
+      "lucky": {
+        "color": "#FF3B30",
+        "commit": "feat: co-authored (kind of)",
+        "time": "两个人都还没饿的窗口期",
+        "avoid": "性格不合的同事",
+        "companion": "VIII 力量（一起忍的人）",
+        "color_name": "屏幕共享时那个小红点"
+      }
+    },
+    {
+      "id": "07",
+      "roman": "VII",
+      "name_traditional": "战车",
+      "name_codex": "// the sprint",
+      "name_technical": "sprint.ship()",
+      "illustration_path": "assets/07-sprint.png",
+      "reading": {
+        "title": "今天是 Sprint 日",
+        "body": "两周一冲刺。\n两周一拉胯。\n两周一假装这次能按时。\n你不是在做项目，你是在做循环。\n牛马的尽头不是终点线，是下一个 Sprint。"
+      },
+      "do_list": [
+        "把\"差不多了\"翻译成具体的百分比",
+        "偷偷把 ticket 拆得更小（虚报进度）",
+        "在 retro 上说一些得体的废话"
+      ],
+      "dont_list": [
+        "真的相信 deadline",
+        "在最后一天说\"我可能赶不上了\"",
+        "跟 PM 解释技术债"
+      ],
+      "lucky": {
+        "color": "#FF453A",
+        "commit": "wip: 80% done (lying)",
+        "time": "周三下午（中间最绝望的那一天）",
+        "avoid": "Sprint Review",
+        "companion": "X 命运之轮（同一个折磨的两种形式）",
+        "color_name": "燃尽图的红色"
+      }
+    },
+    {
+      "id": "08",
+      "roman": "VIII",
+      "name_traditional": "力量",
+      "name_codex": "// the code review",
+      "name_technical": "review.kind()",
+      "illustration_path": "assets/08-code-review.png",
+      "reading": {
+        "title": "今天是代码评审日",
+        "body": "你看着那段代码。\n你想说的有十句。\n你只能说两句。\n剩下八句要忍。\n忍住的话也是一种工作，没人付你工资。"
+      },
+      "do_list": [
+        "在评论前删掉所有感叹号",
+        "把\"这样写不好\"改成\"我们可以考虑\"",
+        "提一句\"写得不错\"哪怕你不觉得"
+      ],
+      "dont_list": [
+        "在评论里写小作文",
+        "用\"很简单\"\"显然\"这种词",
+        "凌晨给别人 review（你的耐心不够）"
+      ],
+      "lucky": {
+        "color": "#6E7781",
+        "commit": "review: lgtm (with reservations)",
+        "time": "你刚吃饱的时候",
+        "avoid": "实习生的第一个 PR",
+        "companion": "XX 审判（被评审过的同盟）",
+        "color_name": "GitHub 评论框的灰"
+      }
+    },
+    {
+      "id": "09",
+      "roman": "IX",
+      "name_traditional": "隐者",
+      "name_codex": "// the maintainer",
+      "name_technical": "maintainer.tend()",
+      "illustration_path": "assets/09-maintainer.png",
+      "reading": {
+        "title": "今天是维护者日",
+        "body": "没人记得你。\n没人给你点赞。\n没人发\"你太厉害了\"。\n你只是默默让系统活着。\n做这件事的人通常不被看见，被看见的通常不做这件事。"
+      },
+      "do_list": [
+        "升级三个无人在意的依赖",
+        "把那个 TODO 真的 do 了",
+        "给自己泡杯茶 然后什么都别说"
+      ],
+      "dont_list": [
+        "等感谢",
+        "解释你做了什么",
+        "把功劳发到团队群"
+      ],
+      "lucky": {
+        "color": "#48484A",
+        "commit": "chore: bump version (没什么好说的)",
+        "time": "所有人都下班之后",
+        "avoid": "能见度、曝光度、影响力",
+        "companion": "V 教皇（在没人看的地方互相照应）",
+        "color_name": "服务器机房灰"
+      }
+    },
+    {
+      "id": "10",
+      "roman": "X",
+      "name_traditional": "命运之轮",
+      "name_codex": "// the standup",
+      "name_technical": "standup.daily()",
+      "illustration_path": "assets/10-standup.png",
+      "reading": {
+        "title": "今天是站会日",
+        "body": "昨天做了什么。\n今天要做什么。\n有没有阻塞。\n你已经背了一百遍。\n没人在听，你也没在说。\n这就是牛马的早晨。"
+      },
+      "do_list": [
+        "把\"昨天写了点代码\"包装成三句话",
+        "提前想好 blocker 的措辞",
+        "看似在听 实则在想中午吃啥"
+      ],
+      "dont_list": [
+        "在站会上发起讨论",
+        "真的回答\"我有没有 blocker\"",
+        "把镜头打开"
+      ],
+      "lucky": {
+        "color": "#1C1C1E",
+        "commit": "站会前快速写一行 装作很忙",
+        "time": "站会结束后那 30 秒的解脱",
+        "avoid": "PM 说\"我们快速过一下\"",
+        "companion": "VII 战车（早晚都得见的两人）",
+        "color_name": "Zoom 摄像头关掉那个黑"
+      }
+    },
+    {
+      "id": "11",
+      "roman": "XI",
+      "name_traditional": "正义",
+      "name_codex": "// the audit",
+      "name_technical": "audit.check()",
+      "illustration_path": "assets/11-audit.png",
+      "reading": {
+        "title": "今天是审计日",
+        "body": "有人来翻你的代码了。\n不是为了夸你 也不是为了帮你。\n是为了找出你哪里没做对。\n你写过的每一行 都会被拿出来看。\n你以为你早就忘了 但它们都还在。"
+      },
+      "do_list": [
+        "把那些临时方案补上注释",
+        "假装你早就这么打算了",
+        "把 TODO 改成 NOTE"
+      ],
+      "dont_list": [
+        "解释当时为什么这么写",
+        "说\"这不是我写的\"",
+        "试图删 git 历史"
+      ],
+      "lucky": {
+        "color": "#EBEBF0",
+        "commit": "chore: address audit findings (sigh)",
+        "time": "audit 开始前的最后一小时",
+        "avoid": "对自己代码的盲目自信",
+        "companion": "IV 皇帝（一起被翻旧账的两人）",
+        "color_name": "合规报告的白"
+      }
+    },
+    {
+      "id": "12",
+      "roman": "XII",
+      "name_traditional": "倒吊人",
+      "name_codex": "// the deadlock",
+      "name_technical": "deadlock.wait()",
+      "illustration_path": "assets/12-deadlock.png",
+      "reading": {
+        "title": "今天是死锁日",
+        "body": "你在等他。\n他在等你。\n你们都觉得对方该先动。\n你们都没有错 但什么也没发生。\n大部分卡住的事情 都不是因为难，是因为没人先松手。"
+      },
+      "do_list": [
+        "先松手 哪怕你觉得不公平",
+        "发那条你拖了三天的消息",
+        "承认你也在等"
+      ],
+      "dont_list": [
+        "再等一天看看",
+        "在心里给自己讲道理",
+        "假装你已经发了"
+      ],
+      "lucky": {
+        "color": "#98989D",
+        "commit": "fix: break the cycle",
+        "time": "你意识到没意义的那一秒",
+        "avoid": "面子",
+        "companion": "XV 恶魔（互相耽误的好朋友）",
+        "color_name": "loading 转圈的灰"
+      }
+    },
+    {
+      "id": "13",
+      "roman": "XIII",
+      "name_traditional": "死神",
+      "name_codex": "// death",
+      "name_technical": "death.delete()",
+      "illustration_path": "assets/13-death.png",
+      "reading": {
+        "title": "今天是重构日",
+        "body": "那个文件你已经看了三个月。\n你知道它该死，它也知道。\n今天就动手。\n留情面是慈悲，但有时候也是软弱。"
+      },
+      "do_list": [
+        "删 500 行代码",
+        "把没人用的功能下线",
+        "跟 PM 说\"这个我不做了\""
+      ],
+      "dont_list": [
+        "删之前\"备份一下\"",
+        "跟自己说\"也许还能用\"",
+        "留情面"
+      ],
+      "lucky": {
+        "color": "#636366",
+        "commit": "refactor: delete deprecated code (rest in peace)",
+        "time": "决心来的那一秒 别犹豫",
+        "avoid": "怀旧",
+        "companion": "XIV 节制（一个动手 一个收尾）",
+        "color_name": "删除线灰"
+      }
+    },
+    {
+      "id": "14",
+      "roman": "XIV",
+      "name_traditional": "节制",
+      "name_codex": "// the refactor in progress",
+      "name_technical": "refactor.iterate()",
+      "illustration_path": "assets/14-refactor-in-progress.png",
+      "reading": {
+        "title": "今天是重构进行中日",
+        "body": "你以为一周能搞完。\n第二周开始你才发现根有多深。\n现在已经第六周了。\n你既不能停 也看不到头。\n你不是在重构代码，你是在搬一座山，一勺一勺。"
+      },
+      "do_list": [
+        "今天只动一个文件",
+        "在 PR 描述里写一句\"还没完\"",
+        "允许自己中途换思路"
+      ],
+      "dont_list": [
+        "估时间",
+        "跟同事说\"快了\"",
+        "回头看你已经写的"
+      ],
+      "lucky": {
+        "color": "#C7C7CC",
+        "commit": "refactor: still in progress (don't ask)",
+        "time": "你愿意打开那个文件的那十分钟",
+        "avoid": "进度汇报",
+        "companion": "XIII 死神（开头是他 结尾是你）",
+        "color_name": "未完成的草稿色"
+      }
+    },
+    {
+      "id": "15",
+      "roman": "XV",
+      "name_traditional": "恶魔",
+      "name_codex": "// the legacy code",
+      "name_technical": "legacy.endure()",
+      "illustration_path": "assets/15-legacy-code.png",
+      "reading": {
+        "title": "今天是屎山日",
+        "body": "你不是在维护这个项目。\n你是在被它喂养。\n它给你工资，你给它生命。\n这就是当代牛马最深的羁绊。\n说是依赖也行，说是爱情也行，反正分不开。"
+      },
+      "do_list": [
+        "在屎里加更多屎 反正没人发现",
+        "写一个 TODO 然后假装会有那一天",
+        "跟新人说\"这块别动 我也不知道为什么这样\""
+      ],
+      "dont_list": [
+        "想\"我能不能重写\"",
+        "跟老板提\"技术债\"",
+        "试图理解原作者当时在想什么"
+      ],
+      "lucky": {
+        "color": "#FFD60A",
+        "commit": "fix: don't ask why this works",
+        "time": "所有清醒的时刻都别碰",
+        "avoid": "刚入职想\"优化一下\"的实习生",
+        "companion": "XII 倒吊人（互相伤害的好朋友）",
+        "color_name": "祖传代码黄"
+      }
+    },
+    {
+      "id": "16",
+      "roman": "XVI",
+      "name_traditional": "高塔",
+      "name_codex": "// the production incident",
+      "name_technical": "incident.revert()",
+      "illustration_path": "assets/16-production-incident.png",
+      "reading": {
+        "title": "今天是生产事故日",
+        "body": "线上挂了。\n你的周末挂了。\n你的稳定性挂了。\n你\"今晚能早睡\"的幻想也挂了。\n但你会修好 你总是修得好。\n这是你的工作，也是你的悲剧。"
+      },
+      "do_list": [
+        "rollback 别犹豫",
+        "在群里假装冷静",
+        "修完立刻去吃一顿",
+        "写复盘 哪怕下次还会再来"
+      ],
+      "dont_list": [
+        "凌晨改代码",
+        "找是谁的锅",
+        "说\"这本来不应该发生\""
+      ],
+      "lucky": {
+        "color": "#FF3B30",
+        "commit": "revert: panic mode engaged",
+        "time": "22:00 之后（事情都是夜里出的）",
+        "avoid": "deploy",
+        "companion": "XX 审判（事故的爱人）",
+        "color_name": "错误红"
+      }
+    },
+    {
+      "id": "17",
+      "roman": "XVII",
+      "name_traditional": "星星",
+      "name_codex": "// the side project",
+      "name_technical": "sideproject.tend()",
+      "illustration_path": "assets/17-side-project.png",
+      "reading": {
+        "title": "今天是副业日",
+        "body": "白天你为别人写代码 晚上为自己。\n白天的代码会被合并 然后被遗忘。\n晚上的代码会被你藏在某个 repo 里 永远不上线。\n但你还是写。\n人需要一件不为了什么的事 才能继续做那些为了什么的事。"
+      },
+      "do_list": [
+        "周末花两小时在没人要看的 demo 上",
+        "把那个想了半年的 idea 真的 init 一下",
+        "允许它永远做不完"
+      ],
+      "dont_list": [
+        "想\"这个能不能变现\"",
+        "在朋友圈预告",
+        "用工作日的精力做"
+      ],
+      "lucky": {
+        "color": "#032B67",
+        "commit": "feat: for me, by me",
+        "time": "周末早晨那两个小时",
+        "avoid": "把它做成正经事",
+        "companion": "0 愚者（一起开新坑的搭子）",
+        "color_name": "深夜电脑屏幕的蓝"
+      }
+    },
+    {
+      "id": "18",
+      "roman": "XVIII",
+      "name_traditional": "月亮",
+      "name_codex": "// the on-call",
+      "name_technical": "oncall.standby()",
+      "illustration_path": "assets/18-oncall.png",
+      "reading": {
+        "title": "今天是 on-call 日",
+        "body": "你没在工作，也没在休息。\n你是一只被绳子拴在工位附近的牛马。\n等那一声尖叫，那个让你心跳停半拍的通知。\n也许今天不会来。\n也许会。\n反正你也跑不掉。"
+      },
+      "do_list": [
+        "假装放松 但手机不离手",
+        "准备好热茶 / 充电器 / 心理建设",
+        "提前下载好你想看的剧",
+        "跟朋友说\"我可能随时要走\""
+      ],
+      "dont_list": [
+        "关静音",
+        "喝多了",
+        "跑去没信号的地方",
+        "期待\"今晚不会有事\""
+      ],
+      "lucky": {
+        "color": "#FF2D20",
+        "commit": "今天不要 commit",
+        "time": "永远不知道",
+        "avoid": "自信",
+        "companion": "XVI 高塔（亲密的敌人）",
+        "color_name": "监控仪表盘的红"
+      }
+    },
+    {
+      "id": "19",
+      "roman": "XIX",
+      "name_traditional": "太阳",
+      "name_codex": "// the ship day",
+      "name_technical": "shipday.release()",
+      "illustration_path": "assets/19-ship-day.png",
+      "reading": {
+        "title": "今天是上线日",
+        "body": "你做到了。\n真的把它推到 main 了。\n全网都能用了。\n你应该高兴。\n你确实高兴。\n高兴地等下一个 bug 报告。\n高兴里掺着一点不安，但这就是上线日的味道。"
+      },
+      "do_list": [
+        "截图发朋友圈 一年才一次",
+        "真心实意地说\"我做的\"",
+        "喝一杯 你值得",
+        "然后睡一觉"
+      ],
+      "dont_list": [
+        "立刻开始下一个项目",
+        "上线 10 分钟内回复任何邮件",
+        "谦虚 今天不需要"
+      ],
+      "lucky": {
+        "color": "#30D158",
+        "commit": "feat: ship it 🚀",
+        "time": "deploy 成功后的那 10 分钟",
+        "avoid": "用户反馈",
+        "companion": "XXI 世界（终于落地的双子）",
+        "color_name": "deploy 完那个绿色 checkmark"
+      }
+    },
+    {
+      "id": "20",
+      "roman": "XX",
+      "name_traditional": "审判",
+      "name_codex": "// the code review after review",
+      "name_technical": "review.receive()",
+      "illustration_path": "assets/20-code-review-after-review.png",
+      "reading": {
+        "title": "今天是被评审日",
+        "body": "你写了一段你以为很好的代码。\n他们给了你 11 条评论。\n你看了一眼 关掉了浏览器。\n你打开 又关掉。\n被看见从来不是一件容易的事 哪怕你想被看见。"
+      },
+      "do_list": [
+        "先去喝杯水 再回复",
+        "把\"已修改\"打出来 哪怕还没改",
+        "对真的有道理的那两条说声谢谢"
+      ],
+      "dont_list": [
+        "立刻反驳",
+        "心里偷偷把对方拉黑",
+        "改一半 然后说\"我下周再继续\""
+      ],
+      "lucky": {
+        "color": "#3A3A3C",
+        "commit": "fix: address review (most of it)",
+        "time": "你愿意重新打开那个 tab 的那一刻",
+        "avoid": "看 reviewer 的头像",
+        "companion": "VIII 力量（review 别人的同盟）",
+        "color_name": "PR 页面被打开后的灰"
+      }
+    },
+    {
+      "id": "21",
+      "roman": "XXI",
+      "name_traditional": "世界",
+      "name_codex": "// the mvp",
+      "name_technical": "mvp.launch()",
+      "illustration_path": "assets/21-mvp.png",
+      "reading": {
+        "title": "今天是 MVP 日",
+        "body": "你做出来了。\n它能跑了。\n它甚至有了一两个用户。\n你回头看 它已经不像你最初想的样子了。\n所有真正落地的东西 都是从理想里降级出来的。\n但它活着 这就够了。"
+      },
+      "do_list": [
+        "发出去 哪怕还不完美",
+        "把\"v0.1\" 真的写在 README 里",
+        "听用户的话 而不是听你自己的"
+      ],
+      "dont_list": [
+        "再加一个功能就上线",
+        "等它\"完美了再说\"",
+        "回头改你已经定的取舍"
+      ],
+      "lucky": {
+        "color": "#34C759",
+        "commit": "release: v0.1 (it's alive)",
+        "time": "你说\"够了\"的那一秒",
+        "avoid": "完美主义",
+        "companion": "XIX 太阳（终于落地的双子）",
+        "color_name": "第一个 user 上线的绿"
+      }
+    }
+  ]
+}

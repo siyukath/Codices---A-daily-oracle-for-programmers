@@ -696,7 +696,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
-  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@400&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@400&family=Noto+Serif+SC:wght@300;400&family=Noto+Sans+SC:wght@400&display=swap"
   rel="stylesheet"
 />
 <style>
@@ -708,8 +708,8 @@
     --hairline:  #1F1F1F;
     --gold:      #C9A961;
     --accent:    #C9302C;
-    --serif: "Cormorant Garamond", "EB Garamond", Georgia, serif;
-    --mono:  "JetBrains Mono", "Menlo", "Consolas", monospace;
+    --serif: "Cormorant Garamond", "EB Garamond", "Noto Serif SC", Georgia, serif;
+    --mono:  "JetBrains Mono", "Menlo", "Consolas", "Noto Sans SC", monospace;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -728,7 +728,12 @@
   body {
     min-height: 100vh;
     overflow-x: hidden;
+    overscroll-behavior: none;
   }
+
+  /* hide scrollbar indicators globally */
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
 
   #root { min-height: 100vh; }
 
@@ -1715,6 +1720,18 @@
     border: 0;
   }
 
+  /* ZH reading title (今天是XX日) — sits between card name and body */
+  .reading__zh-title {
+    margin-top: 20px;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-style: normal;
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+  }
+
   /* DO / DON'T lists */
   .reading__section-head {
     font-family: var(--mono);
@@ -1802,6 +1819,12 @@
     border: 1px solid var(--dim);
     border-radius: 2px;
     flex: 0 0 auto;
+  }
+  .reading__lucky-color-name {
+    margin-left: 6px;
+    color: var(--dim);
+    font-size: 12px;
+    letter-spacing: 0.04em;
   }
   .reading__footer {
     margin-top: 56px;
@@ -2190,7 +2213,7 @@
     .landing__block   { max-width: 100%; }
     .landing__lede    { font-size: 24px; }
     .landing__prompt  { font-size: 15px; }
-    .landing__input   { font-size: 15px; }
+    .landing__input   { font-size: 16px; }
     .landing__inputrow { width: 90vw; max-width: 90vw; }
     .landing__hint    { font-size: 11px; }
 
@@ -2600,6 +2623,14 @@
   border-bottom-color: var(--fg);
 }
 
+/* In ZH mode, suppress synthetic italic on serif elements — Noto Serif SC
+   has no italic variant and synthetic oblique looks bad on Chinese glyphs */
+[data-lang="zh"] .about-modal__title,
+[data-lang="zh"] .card__title,
+[data-lang="zh"] .reading__keyword {
+  font-style: normal;
+}
+
 /* Vine column */
 .about-modal__vine-col {
   grid-column: 2;
@@ -2726,6 +2757,35 @@
   grid-template-columns: 1.5fr 1fr;
   gap: 5px;
 }
+
+/* ─── LANGUAGE SWITCHER ──────────────────────────────────────── */
+.lang-switch {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+.lang-switch__btn {
+  background: none;
+  border: none;
+  color: var(--dim);
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: color 200ms;
+  line-height: 1;
+}
+.lang-switch__btn.is-active { color: #C9A961; }
+.lang-switch__btn:hover:not(.is-active) { color: var(--fg); }
+.lang-switch__sep { color: var(--dimmer); user-select: none; }
+@media (max-width: 768px) {
+  .lang-switch { top: 18px; right: 16px; }
+}
 </style>
 <!-- Vercel Web Analytics -->
 <script>
@@ -2745,7 +2805,107 @@
   <script type="text/babel" data-presets="react">
 
 /* global React */
-const { useEffect, useState, useMemo, useRef } = React;
+const { useEffect, useState, useMemo, useRef, useContext, createContext } = React;
+const LangContext = createContext("en");
+
+// ─────────────────────────────────────────────────────────────────
+//  ZH UI STRINGS — all Chinese copy in one place
+// ─────────────────────────────────────────────────────────────────
+const ZH_UI = {
+  subtitle: {
+    default:      "// 今日命运已 deploy",
+    birthday:     "// 你 init 的这一天",
+    christmas:    "// 圣诞快乐.exe",
+    newyearseve:  "// 这一年.end()",
+    newyearsday:  "// 新年快乐 重启一下",
+    lunarnewyear: "// 春节快乐 重启一下",
+  },
+  timeWindowTitles: {
+    void:      "这个点了 别问我适不适合写代码。",
+    dawn:      "天快亮了 这种时候做的决定多半要后悔。",
+    morning:   "早 你今天怎么这么早。",
+    midday:    "今天的牌 凌晨就给你备好了。",
+    lunch:     "午休时间 牌也想休息一下。",
+    afternoon: "下午这段 最容易出 bug。",
+    evening:   "该下班了 你还在工位。",
+    night:     "这个点还醒着 心里多少有点事。",
+  },
+  landing: {
+    prompt:      "> 输入你的出生时间",
+    placeholder: "YYYYMMDD",
+    error:       "// 时间不对 八位数字 YYYYMMDD",
+    continue:    "// 按回车继续",
+  },
+  reading: {
+    label:        "今日解读",
+    bodySection:  "今日箴言",
+    hint:         "点击翻转 ↻ · 滚动阅读 ↓",
+    do:           "▸ 今天宜",
+    dont:         "▸ 今天忌",
+    lucky:        "今日运势",
+    luckyColor:   "幸运颜色",
+    luckyCommit:  "幸运 COMMIT",
+    luckyTime:    "幸运时间",
+    avoid:        "今天躲开",
+    companion:    "今日搭子",
+    footer:       (t) => `// 下一张牌 ${t}后`,
+    footerFriday: "// weekend.exec() 启动中",
+    footerSunday: "// monday.dread() 开始加载",
+    share:        "分享 →",
+    backToTop:    "↑ 回到顶部",
+  },
+  share: {
+    download:    "↓ 保存图片",
+    working:     "… 生成中",
+    error:       "✕ 再试一次",
+    back:        "← 回到解读",
+    scanCaption: "扫码也来抽一张 ",
+    birthdayLine:"今天是你的生日",
+  },
+  about: {
+    title:      "关于 codices",
+    subtitle:   "// 给程序员的每日塔罗",
+    body: [
+      "codices 是给写代码的人的塔罗。",
+      "22 张牌，每张都是你深夜改 bug 时心里冒出来过的那句话。",
+      "每天一张，不能重抽。你抽到的就是你该抽到的牌。",
+      "这里还藏了 9 个小东西。找到一个，藤蔓上就会长一片叶子。试试全部找到吧。",
+    ],
+    counter:    "找到的小东西",
+    counterAll: "全本已通",
+    sigLine1:   "喜欢 codices？",
+    sigLine2:   "更多作品在 ",
+  },
+  discovery: {
+    sub: "// 藤蔓多了一片叶子",
+    notices: {
+      birthday:    "birth.log: success",
+      holiday:     "今天 算法也放假",
+      angel:       (t) => `${t} — symmetry.observe()`,
+      first:       "hello, stranger",
+      friday:      "这周编译完了 你也活下来了",
+      sunday:      "周一从 std::input 涌来",
+      gilded:      "这个点还醒着 系统记下了",
+      moon:        (p) => p === "full" ? "月亮今天圆 你也别太尖" : "月亮今天藏着 你别问太多",
+      flipfrenzy:  "牌注意到了。",
+    },
+    leaves: {
+      birthday:    "又一年 没崩",
+      holiday:     "今天 系统也歇了",
+      angel:       "数字对上了 你也看到了",
+      first:       "你第一次到这忘了的那天",
+      friday:      "weekend.exec() 总会赢",
+      sunday:      "每周都是同一句 import",
+      gilded:      "bug 都是这个点出来的",
+      moon:        "天空在看你",
+      flipfrenzy:  "三次翻转，十秒，一次坦白",
+    },
+  },
+  compile: {
+    angel:      (n) => `> 天使数字 (${n}) 出现了`,
+    first:      "> welcome.first()",
+  },
+};
 
 /**
  * TarotCard — shared between Screen 3 (animated reveal) and Screen 4 (small static).
@@ -3310,7 +3470,16 @@ window.CornerDecorations = CornerDecorations;
 const IMAGE_SRC = "assets/the-fool.png";
 // Subtitle changes subtly based on cosmic state.
 // Birthday > Holiday > Default.
-function getSubtitle(cosmic) {
+function getSubtitle(cosmic, lang) {
+  if (lang === "zh") {
+    const zh = ZH_UI.subtitle;
+    if (!cosmic) return zh.default;
+    if (cosmic.isBirthday) return zh.birthday;
+    if (cosmic.holiday === "christmas") return zh.christmas;
+    if (cosmic.holiday === "newyearseve") return zh.newyearseve;
+    if (cosmic.holiday === "newyearsday" || cosmic.holiday === "lunarnewyear") return zh.lunarnewyear;
+    return zh.default;
+  }
   if (!cosmic) return "// compiled from void";
   if (cosmic.isBirthday) return "// compiled on the day you began";
   if (cosmic.holiday === "christmas") return "// merry compile";
@@ -3322,6 +3491,7 @@ function getSubtitle(cosmic) {
 
 // Shared brand block — appears on every screen, opens About on click.
 function BrandBlock({ cosmic }) {
+  const lang = useContext(LangContext);
   return (
     <div className="brand">
       <div
@@ -3330,19 +3500,37 @@ function BrandBlock({ cosmic }) {
         style={{ cursor: "pointer" }}>
         codices
       </div>
-      <div className="brand__tag">{getSubtitle(cosmic)}</div>
+      <div className="brand__tag">{getSubtitle(cosmic, lang)}</div>
+    </div>
+  );
+}
+
+function LangSwitch() {
+  const lang = useContext(LangContext);
+  return (
+    <div className="lang-switch">
+      <button
+        className={"lang-switch__btn" + (lang === "en" ? " is-active" : "")}
+        onClick={() => window.__setLang && window.__setLang("en")}
+        aria-label="English">EN</button>
+      <span className="lang-switch__sep">/</span>
+      <button
+        className={"lang-switch__btn" + (lang === "zh" ? " is-active" : "")}
+        onClick={() => window.__setLang && window.__setLang("zh")}
+        aria-label="中文">中</button>
     </div>
   );
 }
 
 /* ───────────────────────── Screen 1: Landing ───────────────────────── */
 function Landing({ onSubmit, cosmic }) {
+  const lang = useContext(LangContext);
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [showButton, setShowButton] = useState(false);
   const inputRef = useRef(null);
   const buttonRef = useRef(null);
-  
+
   // Local mobile detection
   const isMobile = () => /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -3403,7 +3591,7 @@ function Landing({ onSubmit, cosmic }) {
         setError("");
         onSubmit(dt);
       } else {
-        setError("// invalid timestamp — 8 digits, YYYYMMDD");
+        setError(lang === "zh" ? ZH_UI.landing.error : "// invalid timestamp — 8 digits, YYYYMMDD");
       }
     }
   };
@@ -3430,10 +3618,14 @@ function Landing({ onSubmit, cosmic }) {
               ? " landing__lede--gilded landing__lede--" + cosmic.timeWindow.anim
               : "")
           }>
-            {cosmic && cosmic.timeWindow ? cosmic.timeWindow.title : "today's fate compiles at midnight."}
+            {cosmic && cosmic.timeWindow
+              ? (lang === "zh" ? cosmic.timeWindow.titleZh : cosmic.timeWindow.title)
+              : (lang === "zh" ? "今天的牌昨天就给你准备好了。" : "today's fate compiles at midnight.")}
           </div>
           <div className="landing__prompt">
-            &gt; enter your birth timestamp to receive your reading_
+            {lang === "zh"
+              ? ZH_UI.landing.prompt
+              : "> enter your birth timestamp to receive your reading_"}
           </div>
           <div className="landing__inputrow">
             <input
@@ -3445,14 +3637,14 @@ function Landing({ onSubmit, cosmic }) {
               value={value}
               onChange={handleChange}
               onKeyDown={handleKey}
-              placeholder="YYYY / MM / DD"
+              placeholder={lang === "zh" ? ZH_UI.landing.placeholder : "YYYY / MM / DD"}
               aria-label="birth timestamp" />
             
             <span className="landing__cursor" aria-hidden="true" style={showButton ? {display: 'none'} : {}} />
           </div>
           <div className="landing__error">{error}</div>
           <div className="landing__hint" id="hintDesktop">
-            // press enter to continue
+            {lang === "zh" ? ZH_UI.landing.continue : "// press enter to continue"}
           </div>
           <button
             ref={buttonRef}
@@ -3495,6 +3687,17 @@ const LOG_LINES = [
 { t: 3.4, lhs: "> querying node ...", rhs: "" },
 { t: 3.8, lhs: "> card resolved: %ROMAN%", rhs: "" },
 { t: 4.0, lhs: "> %TITLE%", rhs: "", hi: true }];
+
+const LOG_LINES_ZH = [
+{ t: 0.0, lhs: "> 启动 codices.runtime",   rhs: "" },
+{ t: 0.5, lhs: "> 加载 22 个原型",          rhs: "[ok]" },
+{ t: 1.0, lhs: "> 校验星历",                rhs: "[%TZ%]" },
+{ t: 1.5, lhs: "> 拉取月相",                rhs: "[%MOON%, %MOONI%]" },
+{ t: 2.0, lhs: "> 计算 fate.signature ...", rhs: "" },
+{ t: 2.5, lhs: "  seed = %SEED%",           rhs: "" },
+{ t: 3.0, lhs: "> 调用预言者 ...",           rhs: "" },
+{ t: 3.5, lhs: "> 锁定节点 ...",             rhs: "" },
+{ t: 4.0, lhs: "> %TITLE%",                 rhs: "", hi: true }];
 
 const LOG_CPS = 15;  // Slower typing for better readability
 const LOG_LHS_WIDTH = 36;
@@ -3589,6 +3792,8 @@ const DOT_START = { x: 240, y: 0 };
 const DIAMOND_PERIM = 4 * Math.hypot(240, 240);
 
 function CompileOracle({ onDone, card, draw, cosmic }) {
+  const lang = useContext(LangContext);
+  const logLines = lang === "zh" ? LOG_LINES_ZH : LOG_LINES;
   // Record first-visit and angel-number discoveries
   useEffect(() => {
     if (!cosmic) return;
@@ -3658,7 +3863,7 @@ function CompileOracle({ onDone, card, draw, cosmic }) {
     replace("%TZ%", draw && draw.timezone || "UTC");
     return lhs + " " + rhs;
   };
-  const lastLogIdx = LOG_LINES.reduce(
+  const lastLogIdx = logLines.reduce(
     (acc, l, i) => now >= l.t ? i : acc, -1
   );
 
@@ -3760,17 +3965,21 @@ function CompileOracle({ onDone, card, draw, cosmic }) {
 
       <div className="compile__log">
         <div className="compile__inner" aria-live="polite">
-          {LOG_LINES.map((line, i) => renderLogLine(line, i))}
+          {logLines.map((line, i) => renderLogLine(line, i))}
 {cosmic && cosmic.angelNumber && (
   <div className="compile__log-line compile__log-line--easter">
     <span className="compile__log-lhs">
-      &gt; note: angel.number detected ({cosmic.angelNumber})
+      {lang === "zh"
+        ? ZH_UI.compile.angel(cosmic.angelNumber)
+        : `> note: angel.number detected (${cosmic.angelNumber})`}
     </span>
   </div>
 )}
 {cosmic && cosmic.isFirstVisit && (
   <div className="compile__log-line compile__log-line--easter">
-    <span className="compile__log-lhs">&gt; welcome.first()</span>
+    <span className="compile__log-lhs">
+      {lang === "zh" ? ZH_UI.compile.first : "> welcome.first()"}
+    </span>
   </div>
 )}
         </div>
@@ -4175,6 +4384,8 @@ function useTimeUntilMidnight() {
 }
 
 function Reading({ onBack, card, cosmic }) {
+  const lang = useContext(LangContext);
+  const zr = ZH_UI.reading;
   const [showShare, setShowShare] = useState(false);
   const timeUntilMidnight = useTimeUntilMidnight();
 
@@ -4315,26 +4526,35 @@ function Reading({ onBack, card, cosmic }) {
           transition: "opacity 700ms ease-out"
         }}>
         
-        tap to flip ↻ <span className="reading-v2__hint-sep">·</span> scroll to read <span className="reading-v2__hint-arrow">↓</span>
+        {lang === "zh" ? zr.hint : <>tap to flip ↻ <span className="reading-v2__hint-sep">·</span> scroll to read <span className="reading-v2__hint-arrow">↓</span></>}
       </div>
 
       {/* Scrollable content (right column, after the initial 100vh spacer) */}
       <div className="reading-v2__scroll">
         <div className="reading-v2__content">
           <ReadingSegment>
-            <div className="reading__label">// today's reading</div>
+            <div className="reading__label">{lang === "zh" ? zr.label : "// today's reading"}</div>
             <div className="reading__keyword">{card.name_codex}</div>
             <div className="reading__rule" />
-            <div className="reading__body">
-              <p>{card.reading.opening}</p>
-              <p>{card.reading.today}</p>
-              <p>{card.reading.body}</p>
-            </div>
+            {lang === "zh" && card.reading && card.reading.title ? (
+              <>
+                <div className="reading__zh-title">{card.reading.title}</div>
+                <div className="reading__body">
+                  {(card.reading.body || "").split("\n").map((line, i) => <p key={i}>{line}</p>)}
+                </div>
+              </>
+            ) : (
+              <div className="reading__body">
+                <p>{card.reading.opening}</p>
+                <p>{card.reading.today}</p>
+                <p>{card.reading.body}</p>
+              </div>
+            )}
           </ReadingSegment>
 
           <ReadingSegment>
             <hr className="reading__hairline" />
-            <div className="reading__section-head">▸ DO</div>
+            <div className="reading__section-head">{lang === "zh" ? zr.do : "▸ DO"}</div>
             <ul className="reading__list">
               {card.do_list.map((item, i) => <li key={i}>{item}</li>)}
             </ul>
@@ -4342,7 +4562,7 @@ function Reading({ onBack, card, cosmic }) {
 
           <ReadingSegment>
             <hr className="reading__hairline" />
-            <div className="reading__section-head">▸ DON'T</div>
+            <div className="reading__section-head">{lang === "zh" ? zr.dont : "▸ DON'T"}</div>
             <ul className="reading__list">
               {card.dont_list.map((item, i) => <li key={i}>{item}</li>)}
             </ul>
@@ -4350,42 +4570,52 @@ function Reading({ onBack, card, cosmic }) {
 
           <ReadingSegment>
             <hr className="reading__hairline" />
-            <div className="reading__lucky-head">LUCKY</div>
+            <div className="reading__lucky-head">{lang === "zh" ? zr.lucky : "LUCKY"}</div>
             <dl className="reading__lucky">
-              <dt className="reading__lucky-key">LUCKY COLOR</dt>
+              <dt className="reading__lucky-key">{lang === "zh" ? zr.luckyColor : "LUCKY COLOR"}</dt>
               <dd className="reading__lucky-val">
-                <span
-                  className="reading__lucky-swatch"
-                  style={{ background: card.lucky.color }}
-                  aria-hidden="true" />
-                
-                {card.lucky.color}
+                {card.lucky && card.lucky.color && card.lucky.color.startsWith("#") && (
+                  <span
+                    className="reading__lucky-swatch"
+                    style={{ background: card.lucky.color }}
+                    aria-hidden="true" />
+                )}
+                {card.lucky && card.lucky.color}
+                {card.lucky && card.lucky.color_name && (
+                  <span className="reading__lucky-color-name">{card.lucky.color_name}</span>
+                )}
               </dd>
-              <dt className="reading__lucky-key">LUCKY COMMIT</dt>
-              <dd className="reading__lucky-val">{card.lucky.commit}</dd>
-              <dt className="reading__lucky-key">LUCKY TIME</dt>
-              <dd className="reading__lucky-val">{card.lucky.time}</dd>
-              <dt className="reading__lucky-key">AVOID</dt>
-              <dd className="reading__lucky-val">{card.lucky.avoid}</dd>
-              <dt className="reading__lucky-key">COMPANION CARD</dt>
-              <dd className="reading__lucky-val">{card.lucky.companion}</dd>
+              <dt className="reading__lucky-key">{lang === "zh" ? zr.luckyCommit : "LUCKY COMMIT"}</dt>
+              <dd className="reading__lucky-val">{card.lucky && card.lucky.commit}</dd>
+              <dt className="reading__lucky-key">{lang === "zh" ? zr.luckyTime : "LUCKY TIME"}</dt>
+              <dd className="reading__lucky-val">{card.lucky && card.lucky.time}</dd>
+              <dt className="reading__lucky-key">{lang === "zh" ? zr.avoid : "AVOID"}</dt>
+              <dd className="reading__lucky-val">{card.lucky && card.lucky.avoid}</dd>
+              <dt className="reading__lucky-key">{lang === "zh" ? zr.companion : "COMPANION CARD"}</dt>
+              <dd className="reading__lucky-val">{card.lucky && card.lucky.companion}</dd>
             </dl>
-            <div className="reading__footer">// next reading available in {timeUntilMidnight}</div>
+            <div className="reading__footer">
+              {lang === "zh" ? zr.footer(timeUntilMidnight) : `// next reading available in ${timeUntilMidnight}`}
+            </div>
 {cosmic && cosmic.workerVibe === "friday_evening" && (
-  <div className="reading__footer reading__footer--easter">// weekend.exec()</div>
+  <div className="reading__footer reading__footer--easter">
+    {lang === "zh" ? zr.footerFriday : "// weekend.exec()"}
+  </div>
 )}
 {cosmic && cosmic.workerVibe === "sunday_dread" && (
-  <div className="reading__footer reading__footer--easter">// monday.dread()</div>
+  <div className="reading__footer reading__footer--easter">
+    {lang === "zh" ? zr.footerSunday : "// monday.dread()"}
+  </div>
 )}
           </ReadingSegment>
         </div>
       </div>
 
       <div className="reading__nav">
-        <button onClick={() => setShowShare(true)}>share →</button>
+        <button onClick={() => setShowShare(true)}>{lang === "zh" ? zr.share : "share →"}</button>
         <span className="reading__nav-sep">·</span>
         <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          ↑ back to top
+          {lang === "zh" ? zr.backToTop : "↑ back to top"}
         </button>
       </div>
       {showShare &&
@@ -4417,6 +4647,7 @@ function useQrDataUrl(url) {
 }
 
 function ShareCard({ card, dateStr, qrDataUrl, quote, cosmic }) {
+  const lang = useContext(LangContext);
   const quoteText = quote || (card.reading && card.reading.opening) || "";
   return (
     <div className="share-card">
@@ -4454,7 +4685,7 @@ function ShareCard({ card, dateStr, qrDataUrl, quote, cosmic }) {
         {cosmic && cosmic.isBirthday && (
           <div className="sc__birthday-line">
           <span className="sc__birthday-vine">❦</span>
-          <span className="sc__birthday-text">today the universe remembers you</span>
+          <span className="sc__birthday-text">{lang === "zh" ? ZH_UI.share.birthdayLine : "today the universe remembers you"}</span>
           <span className="sc__birthday-star">✦</span>
         </div>
     )}
@@ -4470,7 +4701,7 @@ function ShareCard({ card, dateStr, qrDataUrl, quote, cosmic }) {
               <img className="sc__qr" src={qrDataUrl} alt="QR code to https://codices.vercel.app/" /> :
               <div className="sc__qr-fallback">codices<br />.app</div>}
             </div>
-            <div className="sc__qr-caption">scan to explore</div>
+            <div className="sc__qr-caption">{lang === "zh" ? ZH_UI.share.scanCaption : "scan to explore"}</div>
           </div>
         </div>
       </div>
@@ -4478,6 +4709,7 @@ function ShareCard({ card, dateStr, qrDataUrl, quote, cosmic }) {
 
 }
 function ShareModal({ card, cosmic, onClose }) {
+  const lang = useContext(LangContext);
   const cardRef = useRef(null);
   const [status, setStatus] = useState("idle");
   const [scale, setScale] = useState(0.55);
@@ -4680,11 +4912,11 @@ function ShareModal({ card, cosmic, onClose }) {
       </div>
       <div className="share-modal__actions" onClick={(e) => e.stopPropagation()}>
         <button onClick={handleDownload} disabled={status === "working"}>
-          {status === "working" ? "… rendering" :
-          status === "error" ? "✕ try again" :
-          "↓ download"}
+          {lang === "zh"
+            ? (status === "working" ? ZH_UI.share.working : status === "error" ? ZH_UI.share.error : ZH_UI.share.download)
+            : (status === "working" ? "… rendering" : status === "error" ? "✕ try again" : "↓ download")}
         </button>
-        <button onClick={onClose}>← back to reading</button>
+        <button onClick={onClose}>{lang === "zh" ? ZH_UI.share.back : "← back to reading"}</button>
       </div>
     </div>);
 
@@ -4892,13 +5124,21 @@ const DISCOVERY_CAPTIONS = {
   }
 };
 
-function getDiscoveryNotice(id, context) {
+function getDiscoveryNotice(id, context, lang) {
+  if (lang === "zh") {
+    const n = ZH_UI.discovery.notices[id];
+    if (!n) return "";
+    return typeof n === "function" ? n(context) : n;
+  }
   const caption = DISCOVERY_CAPTIONS[id];
   if (!caption) return "";
   return typeof caption.notice === "function" ? caption.notice(context) : caption.notice;
 }
 
-function getDiscoveryLeaf(id) {
+function getDiscoveryLeaf(id, lang) {
+  if (lang === "zh") {
+    return ZH_UI.discovery.leaves[id] || "";
+  }
   const caption = DISCOVERY_CAPTIONS[id];
   return caption ? caption.leaf : "";
 }
@@ -4908,6 +5148,7 @@ function getDiscoveryLeaf(id) {
 // ─────────────────────────────────────────────────────────────────
 function DiscoveryNotice({ id, context, onDismiss }) {
   const [visible, setVisible] = useState(false);
+  const lang = useContext(LangContext);
 
   useEffect(() => {
     const t1 = setTimeout(() => setVisible(true), 50);
@@ -4923,8 +5164,45 @@ function DiscoveryNotice({ id, context, onDismiss }) {
       <div className="discovery-notice__inner">
         <span className="discovery-notice__star">✦</span>
         <div className="discovery-notice__content">
-          <div className="discovery-notice__main">{getDiscoveryNotice(id, context)}</div>
-          <div className="discovery-notice__sub">a leaf has grown in the codex</div>
+          <div className="discovery-notice__main">{getDiscoveryNotice(id, context, lang)}</div>
+          <div className="discovery-notice__sub">{lang === "zh" ? ZH_UI.discovery.sub : "a leaf has grown in the codex"}</div>
+        </div>
+        <button
+          className="discovery-notice__close"
+          onClick={() => { setVisible(false); setTimeout(() => onDismiss && onDismiss(), 600); }}
+          aria-label="dismiss">✕</button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  DEV EASTER — one-time popup when dev mode is opened (no leaf)
+// ─────────────────────────────────────────────────────────────────
+function DevEasterNotice({ onDismiss }) {
+  const [visible, setVisible] = useState(false);
+  const lang = useContext(LangContext);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setVisible(true), 50);
+    const t2 = setTimeout(() => setVisible(false), 5000);
+    const t3 = setTimeout(() => onDismiss && onDismiss(), 5800);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [onDismiss]);
+
+  return (
+    <div className={"discovery-notice" + (visible ? " is-visible" : "")}>
+      <div className="discovery-notice__inner">
+        <span className="discovery-notice__star">⌨</span>
+        <div className="discovery-notice__content">
+          <div className="discovery-notice__main">
+            {lang === "zh" ? "找到 dev mode 了啊。" : "you found dev mode."}
+          </div>
+          <div className="discovery-notice__sub">
+            {lang === "zh"
+              ? "我没有特别藏 你也没有特别找。"
+              : "i wasn't trying very hard to hide it. neither were you."}
+          </div>
         </div>
         <button
           className="discovery-notice__close"
@@ -4962,6 +5240,8 @@ function AboutModal({ onClose }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  const lang = useContext(LangContext);
+  const za = ZH_UI.about;
   const ALL_EGGS = ALL_EGG_IDS; // defined at module level, shared with DevPanel
   const foundCount = discoveries.filter((d) => ALL_EGGS.includes(d)).length;
   const totalCount = ALL_EGGS.length;
@@ -4973,36 +5253,34 @@ function AboutModal({ onClose }) {
         <button className="about-modal__close" onClick={onClose} aria-label="close">✕</button>
 
         <div className="about-modal__left">
-          <div className="about-modal__title">about codices</div>
-          <div className="about-modal__subtitle">// a daily oracle for the programmer condition</div>
+          <div className="about-modal__title">{lang === "zh" ? za.title : "about codices"}</div>
+          <div className="about-modal__subtitle">{lang === "zh" ? za.subtitle : "// a daily oracle for the programmer condition"}</div>
 
           <div className="about-modal__body">
-            <p>
-              Codices is a tarot for people who think in code.
-              22 cards, each one a small sentence about a thing
-              you've felt at 11pm with a deploy that won't go.
-            </p>
-            <p>
-              One card per day. No re-draws. The card is yours,
-              and it was always going to be that one.
-            </p>
-            <p>
-              There are also <em>{totalCount}</em> hidden things in here.
-              The vine grows as you find them.
-            </p>
+            {lang === "zh" ? (
+              za.body.map((line, i) => <p key={i}>{line}</p>)
+            ) : (
+              <>
+                <p>Codices is a tarot for people who think in code. 22 cards, each one a small sentence about a thing you've felt at 11pm with a deploy that won't go.</p>
+                <p>One card per day. No re-draws. The card is yours, and it was always going to be that one.</p>
+                <p>There are also <em>{totalCount}</em> hidden things in here. The vine grows as you find them.</p>
+              </>
+            )}
           </div>
 
           <div className="about-modal__counter">
             <span className="about-modal__counter-num">{foundCount} / {totalCount}</span>
             <span className="about-modal__counter-label">
-              {allFound ? "the codex is complete" : "discoveries found"}
+              {lang === "zh"
+                ? (allFound ? za.counterAll : za.counter)
+                : (allFound ? "the codex is complete" : "discoveries found")}
             </span>
           </div>
 
           <div className="about-modal__signature">
-            <div className="about-modal__sig-line">like this product?</div>
+            <div className="about-modal__sig-line">{lang === "zh" ? za.sigLine1 : "like this product?"}</div>
             <div className="about-modal__sig-line">
-              see more work at{" "}
+              {lang === "zh" ? za.sigLine2 : "see more work at"}{" "}
               <a
                 href="https://siyukath.com"
                 target="_blank"
@@ -5028,6 +5306,7 @@ function AboutModal({ onClose }) {
 function AboutVine({ discoveries, allEggs, allFound }) {
   const [hoveredLeaf, setHoveredLeaf] = useState(null);
   const [tipPos, setTipPos] = useState({ x: 0, y: 0 });
+  const lang = useContext(LangContext);
   const foundCount = discoveries.length;
 
   const leafSpots = [
@@ -5110,7 +5389,7 @@ function AboutVine({ discoveries, allEggs, allFound }) {
         <div
           className="about-vine__tooltip"
           style={{ left: tipPos.x + 18, top: tipPos.y - 14 }}>
-          {getDiscoveryLeaf(hoveredLeaf)}
+          {getDiscoveryLeaf(hoveredLeaf, lang)}
         </div>,
         document.body
       )}
@@ -5320,14 +5599,14 @@ function useCosmicState(birthDigits, devTick) {
     // ─── Time-of-day window ────────────────────────────────────
     const h = today.hour;
     let timeWindow;
-    if (h >= 0 && h < 4)        timeWindow = { id: "void",      title: "the void is listening.",              gilded: true,  anim: "breathe" };
-    else if (h >= 4 && h < 6)   timeWindow = { id: "dawn",      title: "the dawn compiles.",                  gilded: false, anim: null };
-    else if (h >= 6 && h < 9)   timeWindow = { id: "morning",   title: "the morning awaits input.",           gilded: false, anim: null };
-    else if (h >= 9 && h < 12)  timeWindow = { id: "midday",    title: "today's fate compiles at midnight.",  gilded: false, anim: null };
-    else if (h >= 12 && h < 14) timeWindow = { id: "lunch",     title: "lunch.break() is not idle.",         gilded: false, anim: null };
-    else if (h >= 14 && h < 18) timeWindow = { id: "afternoon", title: "the afternoon runs in production.",   gilded: false, anim: null };
-    else if (h >= 18 && h < 22) timeWindow = { id: "evening",   title: "the evening yields.",                 gilded: false, anim: null };
-    else                         timeWindow = { id: "night",     title: "the night is a long await.",          gilded: true,  anim: "float" };
+    if (h >= 0 && h < 4)        timeWindow = { id: "void",      title: "the void is listening.",              titleZh: "这个点了 别问我适不适合写代码。",       gilded: true,  anim: "breathe" };
+    else if (h >= 4 && h < 6)   timeWindow = { id: "dawn",      title: "the dawn compiles.",                  titleZh: "天快亮了 这种时候做的决定多半要后悔。", gilded: false, anim: null };
+    else if (h >= 6 && h < 9)   timeWindow = { id: "morning",   title: "the morning awaits input.",           titleZh: "早 你今天怎么这么早。",                 gilded: false, anim: null };
+    else if (h >= 9 && h < 12)  timeWindow = { id: "midday",    title: "today's fate compiles at midnight.",  titleZh: "今天的牌 凌晨就给你备好了。",           gilded: false, anim: null };
+    else if (h >= 12 && h < 14) timeWindow = { id: "lunch",     title: "lunch.break() is not idle.",         titleZh: "午休时间 牌也想休息一下。",             gilded: false, anim: null };
+    else if (h >= 14 && h < 18) timeWindow = { id: "afternoon", title: "the afternoon runs in production.",   titleZh: "下午这段 最容易出 bug。",               gilded: false, anim: null };
+    else if (h >= 18 && h < 22) timeWindow = { id: "evening",   title: "the evening yields.",                 titleZh: "该下班了 你还在工位。",                gilded: false, anim: null };
+    else                         timeWindow = { id: "night",     title: "the night is a long await.",          titleZh: "这个点还醒着 心里多少有点事。",         gilded: true,  anim: "float" };
 
     // ─── Approximate moon phase (no API) ──────────────────────
     // Ref new moon: Jan 6, 2000
@@ -5385,6 +5664,10 @@ function App() {
   const [showAbout, setShowAbout] = useState(false);
   const [devTick, setDevTick] = useState(0);
   const [activeNotice, setActiveNotice] = useState(null);
+  const [devEasterKey, setDevEasterKey] = useState(null);
+  const [lang, setLang] = useState(() => {
+    try { return localStorage.getItem("codices_lang") || "en"; } catch(e) { return "en"; }
+  });
   const cosmic = useCosmicState(birthDigits, devTick);
 
   // Expose a global so the brand logo (rendered inside child components)
@@ -5393,6 +5676,20 @@ function App() {
     window.openCodicesAbout = () => setShowAbout(true);
     return () => { delete window.openCodicesAbout; };
   }, []);
+
+  // Expose global lang setter so LangSwitch (deep in tree) can update
+  useEffect(() => {
+    window.__setLang = (l) => {
+      setLang(l);
+      try { localStorage.setItem("codices_lang", l); } catch(e) {}
+    };
+    return () => { delete window.__setLang; };
+  }, []);
+
+  // Sync lang to <html data-lang> so CSS can suppress synthetic italic on ZH
+  useEffect(() => {
+    document.documentElement.dataset.lang = lang;
+  }, [lang]);
 
   // Listen for new discoveries and show the notice banner
   useEffect(() => {
@@ -5404,31 +5701,34 @@ function App() {
     return () => window.removeEventListener("codices:discovery", handleDiscovery);
   }, []);
 
-  // Try inline <script id="cards-data"> first — that always works,
-  // even under file:// where fetch() of a sibling JSON is blocked. Then
-  // attempt a fetch in case cards.json has been updated since the page
-  // was bundled; if it succeeds, swap in the fresher copy.
+  // Load cards for current language. AbortController ensures a stale EN fetch
+  // can't race and overwrite ZH cards after the user switches language.
   useEffect(() => {
-    try {
-      const el = document.getElementById("cards-data");
-      if (el && el.textContent) {
-        const data = JSON.parse(el.textContent);
-        if (data && Array.isArray(data.cards) && data.cards.length > 0) {
-          setCards(data.cards);
+    const controller = new AbortController();
+    const file = lang === "zh" ? "cards_zh.json" : "cards.json";
+    if (lang === "en") {
+      try {
+        const el = document.getElementById("cards-data");
+        if (el && el.textContent) {
+          const data = JSON.parse(el.textContent);
+          if (data && Array.isArray(data.cards) && data.cards.length > 0) {
+            setCards(data.cards);
+          }
         }
+      } catch (e) {
+        console.warn("inline cards-data failed to parse", e);
       }
-    } catch (e) {
-      console.warn("inline cards-data failed to parse", e);
     }
-    fetch("cards.json", { cache: "no-cache" }).
+    fetch(file, { cache: "no-cache", signal: controller.signal }).
     then((r) => r.ok ? r.json() : null).
     then((data) => {
       if (data && Array.isArray(data.cards) && data.cards.length > 0) {
         setCards(data.cards);
       }
     }).
-    catch(() => {/* fine — inline copy already loaded */});
-  }, []);
+    catch(() => {});
+    return () => controller.abort();
+  }, [lang]);
 
   // Press 'D' anywhere to toggle the dev card picker.
   // Ignored while typing into an <input> so it doesn't fight the
@@ -5445,10 +5745,21 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // Show dev-mode easter egg once ever (no leaf, no discovery record)
+  useEffect(() => {
+    if (!devOpen) return;
+    try {
+      if (localStorage.getItem("codices_dev_egg_seen")) return;
+      localStorage.setItem("codices_dev_egg_seen", "1");
+      setDevEasterKey(Date.now());
+    } catch(e) {}
+  }, [devOpen]);
+
   const card = cards[cardIdx] || DEFAULT_CARDS[0];
 
   return (
-    <>
+    <LangContext.Provider value={lang}>
+      <LangSwitch />
       <CornerDecorations />
       {devOpen &&
         <DevPanel
@@ -5466,7 +5777,7 @@ function App() {
           const mo = String(dt.getMonth() + 1).padStart(2, "0");
           const d = String(dt.getDate()).padStart(2, "0");
           const birthDigits = String(y) + mo + d;
-          setBirthDigits(birthDigits); // ★ NEW: save for cosmic state
+          setBirthDigits(birthDigits);
           setScreen("compile");
           try {
             const result = await drawCardForUser(birthDigits);
@@ -5500,7 +5811,10 @@ function App() {
           context={activeNotice.context}
           onDismiss={() => setActiveNotice(null)} />
       )}
-    </>);
+      {devEasterKey && (
+        <DevEasterNotice key={devEasterKey} onDismiss={() => setDevEasterKey(null)} />
+      )}
+    </LangContext.Provider>);
 
 }
 
