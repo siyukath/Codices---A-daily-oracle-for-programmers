@@ -912,49 +912,6 @@
     .landing__inputrow { position: relative; }
   }
   
-  .landing__enter-button {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--dim);
-    background: transparent;
-    border: 1px solid var(--hairline);
-    cursor: pointer;
-    padding: 8px 12px;
-    letter-spacing: 0.06em;
-    transition: all 200ms ease-out;
-    animation: enterPulse 1.5s ease-in-out infinite;
-  }
-  
-  .landing__enter-button:hover {
-    color: #C9A961;
-    border-color: #C9A961;
-    box-shadow: 0 0 12px rgba(201, 169, 97, 0.2);
-  }
-  
-  .landing__enter-button.active {
-    color: #C9A961;
-    border-color: #C9A961;
-    animation: enterArrowFlow 0.8s ease-in-out infinite;
-  }
-  
-  @keyframes enterPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-  }
-  
-  @keyframes enterArrowFlow {
-    0%, 100% {
-      color: #C9A961;
-      box-shadow: 0 0 8px rgba(201, 169, 97, 0.3);
-      transform: translateX(0);
-    }
-    50% {
-      color: #FFE066;
-      box-shadow: 0 0 16px rgba(201, 169, 97, 0.5);
-      transform: translateX(2px);
-    }
-  }
-
   /* ─── Screen 2: Compile + Circuit Oracle (synchronized) ─── */
   .compile {
     min-height: 100vh;
@@ -1460,24 +1417,91 @@
   .reading-v2__hint-sep { color: var(--dimmer); margin: 0 6px; }
 
   /* ─── Floating flourishes (Screen 3) ────────────────── */
-  /* ─── Dev card picker (hidden until 'D' is pressed) ───────────── */
-  .dev-picker {
+  /* ─── DEV PANEL ─────────────────────────────────────── */
+  .devp-overlay {
+    position: fixed; inset: 0; z-index: 9990;
+    pointer-events: none; /* clicks pass through overlay, only panel is interactive */
+  }
+  .devp {
+    pointer-events: all;
     position: fixed;
-    top: 12px;
-    right: 12px;
-    z-index: 1000;
+    bottom: 20px; right: 20px;
+    width: 380px;
+    max-height: 82vh;
+    overflow-y: auto;
+    background: #0A0A0A;
+    border: 1px solid #C9A961;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.85);
     font-family: var(--mono);
     font-size: 12px;
     color: var(--fg);
-    background: var(--bg);
-    border: 1px solid var(--dim);
-    padding: 6px 10px;
-    letter-spacing: 0.02em;
-    max-width: 240px;
+    z-index: 9991;
   }
-  .dev-picker option {
-    background: var(--bg);
-    color: var(--fg);
+  .devp__header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid #C9A961;
+    position: sticky; top: 0; background: #0A0A0A; z-index: 1;
+  }
+  .devp__title { color: #C9A961; font-size: 13px; letter-spacing: 0.06em; }
+  .devp__close {
+    background: none; border: 1px solid #3A3A3A; color: #6B6B6B;
+    width: 28px; height: 28px; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 150ms, border-color 150ms;
+  }
+  .devp__close:hover { color: var(--fg); border-color: #6B6B6B; }
+  .devp__section {
+    padding: 14px 16px;
+    border-bottom: 1px solid #1F1F1F;
+  }
+  .devp__label {
+    font-size: 10px; color: var(--dim); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .devp__badge {
+    background: #1F1F1F; color: #C9A961;
+    padding: 2px 6px; font-size: 10px; letter-spacing: 0.05em;
+    border-radius: 2px;
+  }
+  .devp__hint { font-size: 10px; color: var(--dimmer); margin-bottom: 8px; }
+  .devp__mono { color: #C9A961; letter-spacing: 0.05em; }
+  .devp__select {
+    width: 100%;
+    background: #1F1F1F; border: 1px solid #3A3A3A;
+    color: var(--fg); font-family: var(--mono); font-size: 12px;
+    padding: 6px 8px; letter-spacing: 0.02em;
+  }
+  .devp__grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .devp__row { display: flex; gap: 6px; align-items: center; }
+  .devp__input {
+    width: 56px;
+    background: #1F1F1F; border: 1px solid #3A3A3A;
+    color: var(--fg); font-family: var(--mono); font-size: 12px;
+    padding: 5px 7px;
+  }
+  .devp__btn {
+    background: #1F1F1F; border: 1px solid #3A3A3A;
+    color: var(--dim); font-family: var(--mono); font-size: 11px;
+    padding: 6px 8px; cursor: pointer; text-align: left;
+    letter-spacing: 0.02em; transition: all 150ms;
+  }
+  .devp__btn:hover { border-color: #6B6B6B; color: var(--fg); }
+  .devp__btn--on  { border-color: #C9A961; color: #C9A961; background: #0F0D07; }
+  .devp__btn--gold { background: #C9A961; color: #0A0A0A; border-color: #C9A961; font-weight: bold; }
+  .devp__btn--gold:hover { opacity: 0.85; }
+  .devp__btn--danger { background: #3A0A0A; border-color: #C9302C; color: #E07070; }
+  .devp__btn--danger:hover { background: #C9302C; color: var(--fg); }
+  .devp__pre {
+    margin-top: 10px; padding: 10px;
+    background: #111; border: 1px solid #1F1F1F;
+    font-size: 10px; color: var(--dim);
+    max-height: 180px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  @media (max-width: 480px) {
+    .devp { width: calc(100vw - 24px); right: 12px; bottom: 12px; }
   }
 
   /* ─── Screen 3 page-frame corners (L-bracket + flower) ───────── */
@@ -2018,7 +2042,7 @@
   .sc__ornrow-dot {
     color: #C9A961;
     font-family: var(--mono);
-    font-size: 14px;
+    font-size: 22px;
     line-height: 1;
   }
 
@@ -2029,7 +2053,7 @@
     grid-template-columns: 1fr auto;
     align-items: center;
     margin-top: 20px;
-    gap: 24px;
+    gap: 20px;
   }
   .sc__bottom-left {
     display: flex;
@@ -2038,15 +2062,15 @@
   }
   .sc__brand {
     font-family: var(--serif);
-    font-size: 28px;
+    font-size: 32px;
     color: var(--fg);
     letter-spacing: 0.06em;
   }
   .sc__date {
     font-family: var(--mono);
-    font-size: 14px;
+    font-size: 20px;
     color: var(--dim);
-    letter-spacing: 0.32em;
+    letter-spacing: 0.20em;
   }
   .sc__qr-wrap {
     display: flex;
@@ -2144,7 +2168,15 @@
      ────────────────────────────────────────────────────── */
   @media (max-width: 768px) {
     /* corner blocks closer to the screen edge */
-    .brand     { top: 16px; left: 16px; }
+    .brand {
+      top: 0;
+      left: 0;
+      width: 100vw;
+      padding: 16px 16px 28px 16px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.92) 50%, rgba(10,10,10,0));
+      pointer-events: none; /* let taps through the gradient area below the text */
+    }
+    .brand__name { pointer-events: auto; }
     .footnotes { bottom: 16px; left: 16px; font-size: 11px; }
 
     /* ── Screen 1: anchor input above the imaginary keyboard ── */
@@ -2315,6 +2347,386 @@
   font-style: italic;
   margin-top: 8px;
 }
+
+/* ─── FLIP FRENZY EASTER EGG ─────────────────────────────────── */
+
+/* Card tremor */
+.card-frame--shaking {
+  animation: cardShake 550ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes cardShake {
+  0%,100% { transform: translateX(0) rotate(0deg); }
+  12%  { transform: translateX(-7px) rotate(-1.2deg); }
+  24%  { transform: translateX(7px)  rotate(1.2deg); }
+  36%  { transform: translateX(-5px) rotate(-0.8deg); }
+  48%  { transform: translateX(5px)  rotate(0.8deg); }
+  60%  { transform: translateX(-3px) rotate(-0.4deg); }
+  72%  { transform: translateX(3px)  rotate(0.4deg); }
+  86%  { transform: translateX(-1px) rotate(-0.1deg); }
+}
+
+/* Gold ripple rings */
+.card-ripple {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  overflow: visible;
+}
+.card-ripple__ring {
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid #C9A961;
+  border-radius: 2px;
+  animation: rippleExpand 1.8s ease-out forwards;
+  opacity: 0;
+}
+.card-ripple__ring--2 { animation-delay: 260ms; }
+.card-ripple__ring--3 { animation-delay: 520ms; }
+
+@keyframes rippleExpand {
+  0%   { transform: scale(1);   opacity: 0.75; filter: drop-shadow(0 0 6px rgba(201,169,97,0.6)); }
+  100% { transform: scale(1.55); opacity: 0;   filter: drop-shadow(0 0 0px rgba(201,169,97,0)); }
+}
+
+/* Card back bloom overlay */
+.cb__bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.cb__bloom-flower {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 900ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity  300ms ease-out;
+  opacity: 0;
+}
+.cb__bloom--active .cb__bloom-flower {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Corner positions */
+.cb__bloom-flower--tl { top: 36px;    left: 36px; }
+.cb__bloom-flower--tr { top: 36px;    right: 36px; }
+.cb__bloom-flower--bl { bottom: 36px; left: 36px; }
+.cb__bloom-flower--br { bottom: 36px; right: 36px; }
+
+/* Center starburst */
+.cb__bloom-flower--center {
+  width: 36px;
+  height: 36px;
+  top: 50%;
+  left: 50%;
+  transform: scale(0) translate(-50%, -50%);
+  transform-origin: top left;
+}
+.cb__bloom--active .cb__bloom-flower--center {
+  transform: scale(1) translate(-50%, -50%);
+}
+
+/* Compact card: scale down bloom flowers */
+.card-frame--compact .cb__bloom-flower { width: 18px; height: 18px; }
+.card-frame--compact .cb__bloom-flower--tl { top: 22px; left: 22px; }
+.card-frame--compact .cb__bloom-flower--tr { top: 22px; right: 22px; }
+.card-frame--compact .cb__bloom-flower--bl { bottom: 22px; left: 22px; }
+.card-frame--compact .cb__bloom-flower--br { bottom: 22px; right: 22px; }
+.card-frame--compact .cb__bloom-flower--center { width: 24px; height: 24px; }
+
+/* ─── GILDED HOUR LANDING TITLE ──────────────────────────────── */
+.landing__lede--gilded {
+  color: #C9A961;
+  text-shadow: 0 0 20px rgba(201, 169, 97, 0.18);
+}
+.landing__lede--breathe {
+  animation: gildedBreathe 5s ease-in-out infinite;
+}
+@keyframes gildedBreathe {
+  0%, 100% { opacity: 0.72; letter-spacing: 0em; }
+  50%       { opacity: 1;    letter-spacing: 0.018em; }
+}
+.landing__lede--float {
+  animation: gildedFloat 6s ease-in-out infinite;
+}
+@keyframes gildedFloat {
+  0%, 100% { transform: translateY(0);    opacity: 0.82; }
+  50%       { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ─── ABOUT MODAL ────────────────────────────────────────────── */
+.about-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(10, 10, 10, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  animation: aboutFadeIn 500ms ease-out;
+}
+@keyframes aboutFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.about-modal__inner {
+  position: relative;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #0A0A0A;
+  border: 1px solid #C9A961;
+  padding: 56px 50px 48px;
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  column-gap: 48px;
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .about-modal__inner {
+    display: flex;
+    flex-direction: column;
+    padding: 48px 24px 36px;
+    max-height: 92vh;
+    margin: 10px 15px;
+  }
+  .about-modal__vine-col {
+    order: -1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 0;
+    margin-bottom: 8px;
+  }
+}
+.about-modal__close {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: none;
+  border: 1px solid #3A3A3A;
+  color: #6B6B6B;
+  font-family: var(--mono);
+  font-size: 14px;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 200ms, border-color 200ms;
+  line-height: 1;
+}
+.about-modal__close:hover {
+  color: #EDEDED;
+  border-color: #6B6B6B;
+}
+
+.about-modal__left { grid-column: 1; }
+
+.about-modal__title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 34px;
+  color: var(--fg);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.about-modal__subtitle {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.05em;
+  margin-bottom: 32px;
+}
+.about-modal__body {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.7;
+  color: var(--fg);
+}
+.about-modal__body p { margin: 0 0 16px; }
+.about-modal__body em {
+  color: #C9A961;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 15px;
+}
+.about-modal__counter {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.about-modal__counter-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 30px;
+  color: #C9A961;
+  line-height: 1;
+}
+.about-modal__counter-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.about-modal__signature {
+  margin-top: 36px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+}
+.about-modal__sig-link {
+  color: #C9A961;
+  text-decoration: none;
+  border-bottom: 1px dotted #C9A961;
+  transition: color 200ms, border-color 200ms;
+}
+.about-modal__sig-link:hover {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+
+/* Vine column */
+.about-modal__vine-col {
+  grid-column: 2;
+  grid-row: 1 / span 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8px;
+}
+.about-vine {
+  width: 160px;
+  height: auto;
+}
+
+/* ─── DISCOVERY NOTICE (top banner) ──────────────────────────── */
+.discovery-notice {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translate(-50%, -120%);
+  z-index: 250;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 600ms ease-out;
+  max-width: 90vw;
+}
+.discovery-notice.is-visible {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.discovery-notice__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #0A0A0A;
+  border: 1px solid #C9A961;
+  padding: 16px 24px;
+  min-width: 320px;
+  max-width: 480px;
+}
+.discovery-notice__star {
+  color: #C9A961;
+  font-size: 18px;
+  flex-shrink: 0;
+  animation: noticeStar 3s ease-in-out infinite;
+}
+@keyframes noticeStar {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.discovery-notice__content { flex: 1; min-width: 0; }
+.discovery-notice__main {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: #EDEDED;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.discovery-notice__sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #6B6B6B;
+  letter-spacing: 0.05em;
+}
+.discovery-notice__close {
+  background: none;
+  border: none;
+  color: #6B6B6B;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  flex-shrink: 0;
+  transition: color 200ms;
+}
+.discovery-notice__close:hover { color: #EDEDED; }
+@media (max-width: 768px) {
+  .discovery-notice__inner {
+    min-width: unset;
+    width: calc(100vw - 32px);
+    padding: 14px 18px;
+    gap: 12px;
+  }
+  .discovery-notice__main { font-size: 18px; }
+}
+
+/* ─── ABOUT VINE TOOLTIP ─────────────────────────────────────── */
+.about-vine-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.about-vine__leaf { pointer-events: none; }
+.about-vine__leaf.is-found { pointer-events: auto; }
+.about-vine__leaf.is-found:hover path {
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 5px rgba(201, 169, 97, 0.5));
+}
+.about-vine__tooltip {
+  position: fixed;
+  background: #0A0A0A;
+  border: 1px solid #C9A961;
+  padding: 8px 14px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 15px;
+  color: #EDEDED;
+  white-space: nowrap;
+  z-index: 9999;
+  pointer-events: none;
+  animation: tooltipFadeIn 250ms ease-out;
+}
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── DEV PANEL: egg preview grid ───────────────────────────── */
+.devp__grid-egg {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 5px;
+}
 </style>
 <!-- Vercel Web Analytics -->
 <script>
@@ -2374,11 +2786,33 @@ function TarotCard(props) {
   // flip state — click toggles, pulse runs alongside for 600ms
   const [flipped, setFlipped] = useState(false);
   const [flipping, setFlipping] = useState(false);
+
+  // Easter egg: 3 flips within 10 seconds → tremor + gold ripple + bloom
+  const flipTimestamps = useRef([]);
+  const [shaking, setShaking] = useState(false);
+  const [rippling, setRippling] = useState(false);
+  const [bloomed, setBloomed] = useState(false);
+
   const handleFlip = (e) => {
     e.stopPropagation();
     setFlipped((f) => !f);
     setFlipping(true);
     setTimeout(() => setFlipping(false), 600);
+
+    const now = Date.now();
+    flipTimestamps.current = flipTimestamps.current
+      .filter((t) => now - t < 10000)
+      .concat(now);
+
+    if (flipTimestamps.current.length >= 3 && !bloomed) {
+      flipTimestamps.current = [];
+      setBloomed(true);
+      setShaking(true);
+      setRippling(true);
+      recordDiscovery("flipfrenzy");
+      setTimeout(() => setShaking(false), 600);
+      setTimeout(() => setRippling(false), 2200);
+    }
   };
 
   useEffect(() => {
@@ -2428,16 +2862,18 @@ function TarotCard(props) {
     "--perim": perim
   };
 
+  const allClasses = classes.concat(shaking ? ["card-frame--shaking"] : []);
+
   return (
     <div
-      className={classes.join(" ")}
+      className={allClasses.join(" ")}
       style={style}
       onClick={handleFlip}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {if (e.key === "Enter" || e.key === " ") handleFlip(e);}}
       aria-label={flipped ? "card back — tap to flip" : "card front — tap to flip"}>
-      
+
       <div className={"card-frame__inner" + (flipped ? " is-flipped" : "")}>
         {/* ─── FRONT FACE ───────────────────────── */}
         <div className="card-frame__face card-frame__face--front">
@@ -2476,11 +2912,20 @@ function TarotCard(props) {
           <CornerOrnament className="card-frame__corner card-frame__corner--tr" />
           <CornerOrnament className="card-frame__corner card-frame__corner--bl" />
           <CornerOrnament className="card-frame__corner card-frame__corner--br" />
-          <CardBack />
+          <CardBack bloomed={bloomed} />
         </div>
       </div>
 
       <div className={"card-frame__pulse" + (flipping ? " is-flipping" : "")} aria-hidden="true" />
+
+      {/* Gold ripple rings — appear on easter egg trigger */}
+      {rippling && (
+        <div className="card-ripple" aria-hidden="true">
+          <div className="card-ripple__ring" />
+          <div className="card-ripple__ring card-ripple__ring--2" />
+          <div className="card-ripple__ring card-ripple__ring--3" />
+        </div>
+      )}
     </div>);
 
 }
@@ -2490,7 +2935,7 @@ function TarotCard(props) {
  * user; ornamental, repeatable, like the back of playing cards. No
  * personal metadata lives here (it surfaces on the share card).
  */
-function CardBack() {
+function CardBack({ bloomed = false }) {
   return (
     <div className="card-back-v2">
       <div className="cb__corner cb__corner--tl">✦</div>
@@ -2516,6 +2961,39 @@ function CardBack() {
       <div className="cb__motif"><CardBackMotif /></div>
 
       <div className="cb__brand">CODICES</div>
+
+      {/* Easter egg bloom — 4 corner flowers + center burst */}
+      <div className={"cb__bloom" + (bloomed ? " cb__bloom--active" : "")} aria-hidden="true">
+        {/* Corner flowers */}
+        {[
+          { cls: "cb__bloom-flower--tl", delay: 0 },
+          { cls: "cb__bloom-flower--tr", delay: 120 },
+          { cls: "cb__bloom-flower--bl", delay: 240 },
+          { cls: "cb__bloom-flower--br", delay: 360 },
+        ].map(({ cls, delay }) => (
+          <svg key={cls} className={"cb__bloom-flower " + cls} style={{ transitionDelay: bloomed ? delay + "ms" : "0ms" }}
+            viewBox="-18 -18 36 36" aria-hidden="true">
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => (
+              <g key={i} transform={`rotate(${a})`}>
+                <path d="M 0 0 Q 3 -7, 0 -13 Q -3 -7, 0 0 Z"
+                  fill="none" stroke="#C9A961" strokeWidth="0.9" strokeOpacity="0.9" />
+              </g>
+            ))}
+            <circle cx="0" cy="0" r="2" fill="#C9A961" />
+          </svg>
+        ))}
+        {/* Center starburst — slightly delayed */}
+        <svg className={"cb__bloom-flower cb__bloom-flower--center"} style={{ transitionDelay: bloomed ? "500ms" : "0ms" }}
+          viewBox="-22 -22 44 44" aria-hidden="true">
+          {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((a, i) => (
+            <g key={i} transform={`rotate(${a})`}>
+              <line x1="0" y1="6" x2="0" y2="18" stroke="#C9A961" strokeWidth="0.8" strokeOpacity="0.7" />
+            </g>
+          ))}
+          <circle cx="0" cy="0" r="3.5" fill="none" stroke="#C9A961" strokeWidth="0.8" />
+          <circle cx="0" cy="0" r="1.5" fill="#C9A961" />
+        </svg>
+      </div>
     </div>);
 
 }
@@ -2843,8 +3321,23 @@ function getSubtitle(cosmic) {
   return "// compiled from void";
 }
 
+// Shared brand block — appears on every screen, opens About on click.
+function BrandBlock({ cosmic }) {
+  return (
+    <div className="brand">
+      <div
+        className="brand__name"
+        onClick={() => window.openCodicesAbout && window.openCodicesAbout()}
+        style={{ cursor: "pointer" }}>
+        codices
+      </div>
+      <div className="brand__tag">{getSubtitle(cosmic)}</div>
+    </div>
+  );
+}
+
 /* ───────────────────────── Screen 1: Landing ───────────────────────── */
-function Landing({ onSubmit,cosmic }) {
+function Landing({ onSubmit, cosmic }) {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [showButton, setShowButton] = useState(false);
@@ -2855,6 +3348,20 @@ function Landing({ onSubmit,cosmic }) {
   const isMobile = () => /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   useEffect(() => {inputRef.current && inputRef.current.focus();}, []);
+
+  // Record gilded-hour discovery
+  useEffect(() => {
+    if (cosmic && cosmic.timeWindow && cosmic.timeWindow.gilded) {
+      recordDiscovery("gilded");
+    }
+  }, [cosmic]);
+
+  // Record moon discovery
+  useEffect(() => {
+    if (cosmic && cosmic.isSpecialMoon) {
+      recordDiscovery("moon", cosmic.moonPhaseType);
+    }
+  }, [cosmic]);
 
   const validate = (v) => {
     const digits = v.replace(/\D/g, "");
@@ -2914,14 +3421,18 @@ function Landing({ onSubmit,cosmic }) {
 
   return (
     <div className="screen" data-screen-label="01 Landing">
-      <div className="brand">
-        <div className="brand__name">codices</div>
-        <div className="brand__tag">{getSubtitle(cosmic)}</div>
-      </div>
+      <BrandBlock cosmic={cosmic} />
 
       <div className="landing__center">
         <div className="landing__block">
-          <div className="landing__lede">Today's fate compiles at midnight.</div>
+          <div className={
+            "landing__lede" +
+            (cosmic && cosmic.timeWindow && cosmic.timeWindow.gilded
+              ? " landing__lede--gilded landing__lede--" + cosmic.timeWindow.anim
+              : "")
+          }>
+            {cosmic && cosmic.timeWindow ? cosmic.timeWindow.title : "today's fate compiles at midnight."}
+          </div>
           <div className="landing__prompt">
             &gt; enter your birth timestamp to receive your reading_
           </div>
@@ -2938,13 +3449,13 @@ function Landing({ onSubmit,cosmic }) {
               placeholder="YYYY / MM / DD"
               aria-label="birth timestamp" />
             
-            <span className="landing__cursor" aria-hidden="true" />
+            <span className="landing__cursor" aria-hidden="true" style={showButton ? {display: 'none'} : {}} />
           </div>
           <div className="landing__error">{error}</div>
           <div className="landing__hint" id="hintDesktop">
             // press enter to continue
           </div>
-          <button 
+          <button
             ref={buttonRef}
             id="mobileSubmitArrow"
             className="landing__submit-arrow"
@@ -3079,6 +3590,13 @@ const DOT_START = { x: 240, y: 0 };
 const DIAMOND_PERIM = 4 * Math.hypot(240, 240);
 
 function CompileOracle({ onDone, card, draw, cosmic }) {
+  // Record first-visit and angel-number discoveries
+  useEffect(() => {
+    if (!cosmic) return;
+    if (cosmic.isFirstVisit) recordDiscovery("first");
+    if (cosmic.angelNumber) recordDiscovery("angel", cosmic.angelNumber);
+  }, [cosmic]);
+
   // Single time clock for everything. Drives both the log typing and the
   // circuit board events from one performance.now() reading.
   const [, setTick] = useState(0);
@@ -3239,7 +3757,8 @@ function CompileOracle({ onDone, card, draw, cosmic }) {
     <div
       className={"screen compile" + (phase === "collapse" ? " is-collapsing" : "")}
       data-screen-label="02 Compile + Oracle">
-      
+      <BrandBlock cosmic={cosmic} />
+
       <div className="compile__log">
         <div className="compile__inner" aria-live="polite">
           {LOG_LINES.map((line, i) => renderLogLine(line, i))}
@@ -3638,8 +4157,37 @@ function BirthdayVines({ active }) {
   );
 }
 
+function useTimeUntilMidnight() {
+  const calc = () => {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const ms = midnight - now;
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    return `${h}h ${m}m`;
+  };
+  const [label, setLabel] = useState(calc);
+  useEffect(() => {
+    const id = setInterval(() => setLabel(calc()), 60000);
+    return () => clearInterval(id);
+  }, []);
+  return label;
+}
+
 function Reading({ onBack, card, cosmic }) {
   const [showShare, setShowShare] = useState(false);
+  const timeUntilMidnight = useTimeUntilMidnight();
+
+  // Record easter egg discoveries triggered by the reading context
+  useEffect(() => {
+    if (!cosmic) return;
+    if (cosmic.isBirthday) recordDiscovery("birthday");
+    if (cosmic.holiday) recordDiscovery("holiday");
+    if (cosmic.workerVibe === "friday_evening") recordDiscovery("friday");
+    if (cosmic.workerVibe === "sunday_dread") recordDiscovery("sunday");
+  }, [cosmic]);
+
   // ── scroll & viewport tracking (rAF-throttled) ────────────────────
   const [scrollY, setScrollY] = useState(0);
   const [vh, setVh] = useState(typeof window !== "undefined" ? window.innerHeight : 900);
@@ -3729,7 +4277,8 @@ function Reading({ onBack, card, cosmic }) {
     <div
       className="screen reading-v2"
       data-screen-label="03 Card + Reading">
-      
+      <BrandBlock cosmic={cosmic} />
+
       {/* page-frame corners with flowers — only visible while the card
                            is centered (cardP === 0). They fade out as the user scrolls
                            and the card docks left. */}
@@ -3822,7 +4371,7 @@ function Reading({ onBack, card, cosmic }) {
               <dt className="reading__lucky-key">COMPANION CARD</dt>
               <dd className="reading__lucky-val">{card.lucky.companion}</dd>
             </dl>
-            <div className="reading__footer">// next reading available in 23h 14m</div>
+            <div className="reading__footer">// next reading available in {timeUntilMidnight}</div>
 {cosmic && cosmic.workerVibe === "friday_evening" && (
   <div className="reading__footer reading__footer--easter">// weekend.exec()</div>
 )}
@@ -4143,6 +4692,433 @@ function ShareModal({ card, cosmic, onClose }) {
 }
 window.ShareModal = ShareModal;
 
+// ─────────────────────────────────────────────────────────────────
+//  DEV PANEL — full easter egg testing panel (D key to toggle)
+// ─────────────────────────────────────────────────────────────────
+const ALL_EGG_IDS = [
+  "birthday","holiday","angel","first","friday","sunday","gilded","moon","flipfrenzy"
+];
+const EGG_LABELS = {
+  birthday: "Birthday",    holiday:    "Holiday",      angel:      "Angel #",
+  first:    "First Visit", friday:     "Friday 18+",   sunday:     "Sunday 22+",
+  gilded:   "Gilded Hour", moon:       "Moon Phase",   flipfrenzy: "Flip Frenzy",
+};
+const TIME_PRESETS = [
+  { h: 0,  label: "00:00  void" },    { h: 4,  label: "04:00  dawn" },
+  { h: 6,  label: "06:00  morning" }, { h: 9,  label: "09:00  midday" },
+  { h: 12, label: "12:00  lunch" },   { h: 14, label: "14:00  afternoon" },
+  { h: 18, label: "18:00  evening" }, { h: 22, label: "22:00  night" },
+];
+
+function DevPanel({ cards, cardIdx, onCardChange, onDevTick, onClose }) {
+  const readDisc = () => {
+    try { return JSON.parse(localStorage.getItem("codices_discoveries") || "[]"); }
+    catch { return []; }
+  };
+  const [discoveries, setDiscoveries] = useState(readDisc);
+  const [showStorage, setShowStorage] = useState(false);
+  const [manualHour, setManualHour] = useState("12");
+
+  const currentOverride = (() => {
+    try { const v = localStorage.getItem("dev_hour_override"); return v !== null ? parseInt(v,10) : null; }
+    catch { return null; }
+  })();
+
+  const setHour = (h) => { localStorage.setItem("dev_hour_override", String(h)); onDevTick(); };
+  const clearHour = () => { localStorage.removeItem("dev_hour_override"); onDevTick(); };
+
+  const addEgg = (id) => {
+    const found = readDisc();
+    if (!found.includes(id)) { found.push(id); localStorage.setItem("codices_discoveries", JSON.stringify(found)); }
+    setDiscoveries(readDisc());
+  };
+  const clearEggs = () => { localStorage.removeItem("codices_discoveries"); setDiscoveries([]); };
+
+  const NOTICE_CONTEXTS = {
+    angel: "11:11", moon: "full"
+  };
+  const testNotice = (id) => {
+    window.dispatchEvent(new CustomEvent("codices:discovery", {
+      detail: { id, context: NOTICE_CONTEXTS[id] || undefined }
+    }));
+  };
+
+  const storageSnap = () => {
+    const obj = {};
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); obj[k] = localStorage.getItem(k); }
+    return JSON.stringify(obj, null, 2);
+  };
+
+  const found = discoveries.filter((d) => ALL_EGG_IDS.includes(d));
+  const todayStr = (() => {
+    const n = new Date();
+    return n.getFullYear() + " / " + String(n.getMonth()+1).padStart(2,"0") + " / " + String(n.getDate()).padStart(2,"0");
+  })();
+
+  return (
+    <div className="devp-overlay" onClick={onClose}>
+      <div className="devp" onClick={(e) => e.stopPropagation()}>
+        <div className="devp__header">
+          <span className="devp__title">// dev mode</span>
+          <button className="devp__close" onClick={onClose}>✕</button>
+        </div>
+
+        {/* Card picker */}
+        <div className="devp__section">
+          <div className="devp__label">card</div>
+          <select className="devp__select" value={cardIdx}
+            onChange={(e) => onCardChange(parseInt(e.target.value, 10) || 0)}>
+            {cards.map((c, i) => <option key={c.id} value={i}>{c.roman} — {c.name_codex}</option>)}
+          </select>
+        </div>
+
+        {/* Time window */}
+        <div className="devp__section">
+          <div className="devp__label">
+            time window
+            {currentOverride !== null && <span className="devp__badge">→ {currentOverride}:00</span>}
+          </div>
+          <div className="devp__grid2">
+            {TIME_PRESETS.map(({ h, label }) => (
+              <button key={h} onClick={() => setHour(h)}
+                className={"devp__btn" + (currentOverride === h ? " devp__btn--on" : "")}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="devp__row" style={{ marginTop: 8 }}>
+            <input className="devp__input" type="number" min="0" max="23"
+              value={manualHour} onChange={(e) => setManualHour(e.target.value)} placeholder="0-23" />
+            <button className="devp__btn devp__btn--gold"
+              onClick={() => { const h = parseInt(manualHour,10); if (h >= 0 && h <= 23) setHour(h); }}>
+              set
+            </button>
+            {currentOverride !== null &&
+              <button className="devp__btn" onClick={clearHour}>real time</button>}
+          </div>
+        </div>
+
+        {/* Discoveries */}
+        <div className="devp__section">
+          <div className="devp__label">
+            discoveries <span className="devp__badge">{found.length} / {ALL_EGG_IDS.length}</span>
+          </div>
+          <div className="devp__hint" style={{ marginBottom: 8 }}>+ to add  ▶ to preview notice</div>
+          <div className="devp__grid-egg">
+            {ALL_EGG_IDS.map((id) => (
+              <React.Fragment key={id}>
+                <button onClick={() => addEgg(id)}
+                  className={"devp__btn" + (discoveries.includes(id) ? " devp__btn--on" : "")}>
+                  {discoveries.includes(id) ? "✓ " : "+ "}{EGG_LABELS[id]}
+                </button>
+                <button onClick={() => testNotice(id)} className="devp__btn">
+                  ▶ preview
+                </button>
+              </React.Fragment>
+            ))}
+          </div>
+          <button className="devp__btn devp__btn--danger" style={{ marginTop: 8, width: "100%" }}
+            onClick={clearEggs}>clear discoveries</button>
+        </div>
+
+        {/* Birthday helper */}
+        <div className="devp__section">
+          <div className="devp__label">birthday egg</div>
+          <div className="devp__hint">enter as birth date on landing to trigger</div>
+          <div className="devp__mono">{todayStr}</div>
+        </div>
+
+        {/* Storage inspector */}
+        <div className="devp__section">
+          <div className="devp__label">localStorage</div>
+          <button className="devp__btn" onClick={() => setShowStorage((s) => !s)}>
+            {showStorage ? "hide" : "inspect"}
+          </button>
+          {showStorage && <pre className="devp__pre">{storageSnap()}</pre>}
+        </div>
+
+        {/* Nuke */}
+        <div className="devp__section" style={{ borderBottom: "none" }}>
+          <button className="devp__btn devp__btn--danger" style={{ width: "100%" }}
+            onClick={() => { localStorage.clear(); window.location.reload(); }}>
+            clear all localStorage + reload
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  DISCOVERY CAPTIONS — soul text for each easter egg
+// ─────────────────────────────────────────────────────────────────
+const DISCOVERY_CAPTIONS = {
+  birthday: {
+    notice: "birth.log: success",
+    leaf: "one more year compiled without segfault"
+  },
+  holiday: {
+    notice: "even algorithms observe holidays",
+    leaf: "today, the system pauses too"
+  },
+  angel: {
+    notice: (time) => `${time} — symmetry.observe()`,
+    leaf: "the numbers align. you noticed."
+  },
+  first: {
+    notice: "hello, stranger",
+    leaf: "the day you first arrived"
+  },
+  friday: {
+    notice: "the week compiled. you survived.",
+    leaf: "weekend.exec() was always going to win"
+  },
+  sunday: {
+    notice: "monday is approaching from std::input",
+    leaf: "every week, the same import statement"
+  },
+  gilded: {
+    notice: "you were awake in the golden dark",
+    leaf: "the hours when bugs reveal themselves"
+  },
+  moon: {
+    notice: (phase) => phase === "full"
+      ? "the moon is complete. so are you."
+      : "the moon is hidden. so is the answer.",
+    leaf: "the sky was looking back"
+  },
+  flipfrenzy: {
+    notice: "the cards have noticed.",
+    leaf: "three flips, ten seconds, one confession"
+  }
+};
+
+function getDiscoveryNotice(id, context) {
+  const caption = DISCOVERY_CAPTIONS[id];
+  if (!caption) return "";
+  return typeof caption.notice === "function" ? caption.notice(context) : caption.notice;
+}
+
+function getDiscoveryLeaf(id) {
+  const caption = DISCOVERY_CAPTIONS[id];
+  return caption ? caption.leaf : "";
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  DISCOVERY NOTICE — top banner that slides in on egg discovery
+// ─────────────────────────────────────────────────────────────────
+function DiscoveryNotice({ id, context, onDismiss }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setVisible(true), 50);
+    const t2 = setTimeout(() => setVisible(false), 3500);
+    const t3 = setTimeout(() => onDismiss && onDismiss(), 4200);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [onDismiss]);
+
+  if (!id) return null;
+
+  return (
+    <div className={"discovery-notice" + (visible ? " is-visible" : "")}>
+      <div className="discovery-notice__inner">
+        <span className="discovery-notice__star">✦</span>
+        <div className="discovery-notice__content">
+          <div className="discovery-notice__main">{getDiscoveryNotice(id, context)}</div>
+          <div className="discovery-notice__sub">a leaf has grown in the codex</div>
+        </div>
+        <button
+          className="discovery-notice__close"
+          onClick={() => { setVisible(false); setTimeout(() => onDismiss && onDismiss(), 600); }}
+          aria-label="dismiss">✕</button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  ABOUT MODAL — introduction + easter egg vine
+// ─────────────────────────────────────────────────────────────────
+function AboutModal({ onClose }) {
+  const [discoveries, setDiscoveries] = useState([]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("codices_discoveries");
+      setDiscoveries(raw ? JSON.parse(raw) : []);
+    } catch (e) {/* silent */}
+  }, []);
+
+  // Lock body scroll while open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  // Close on Esc
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const ALL_EGGS = ALL_EGG_IDS; // defined at module level, shared with DevPanel
+  const foundCount = discoveries.filter((d) => ALL_EGGS.includes(d)).length;
+  const totalCount = ALL_EGGS.length;
+  const allFound = foundCount === totalCount;
+
+  return (
+    <div className="about-modal" onClick={onClose}>
+      <div className="about-modal__inner" onClick={(e) => e.stopPropagation()}>
+        <button className="about-modal__close" onClick={onClose} aria-label="close">✕</button>
+
+        <div className="about-modal__left">
+          <div className="about-modal__title">about codices</div>
+          <div className="about-modal__subtitle">// a daily oracle for the programmer condition</div>
+
+          <div className="about-modal__body">
+            <p>
+              Codices is a tarot for people who think in code.
+              22 cards, each one a small sentence about a thing
+              you've felt at 11pm with a deploy that won't go.
+            </p>
+            <p>
+              One card per day. No re-draws. The card is yours,
+              and it was always going to be that one.
+            </p>
+            <p>
+              There are also <em>{totalCount}</em> hidden things in here.
+              The vine grows as you find them.
+            </p>
+          </div>
+
+          <div className="about-modal__counter">
+            <span className="about-modal__counter-num">{foundCount} / {totalCount}</span>
+            <span className="about-modal__counter-label">
+              {allFound ? "the codex is complete" : "discoveries found"}
+            </span>
+          </div>
+
+          <div className="about-modal__signature">
+            <div className="about-modal__sig-line">like this product?</div>
+            <div className="about-modal__sig-line">
+              see more work at{" "}
+              <a
+                href="https://siyukath.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-modal__sig-link">
+                siyukath.com
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="about-modal__vine-col">
+          <AboutVine discoveries={discoveries} allEggs={ALL_EGG_IDS} allFound={allFound} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  ABOUT VINE — SVG vine with N leaves; hover shows leaf caption
+// ─────────────────────────────────────────────────────────────────
+function AboutVine({ discoveries, allEggs, allFound }) {
+  const [hoveredLeaf, setHoveredLeaf] = useState(null);
+  const [tipPos, setTipPos] = useState({ x: 0, y: 0 });
+  const foundCount = discoveries.length;
+
+  const leafSpots = [
+    { x: 58,  y: 310, r: -28 },
+    { x: 130, y: 275, r:  32 },
+    { x: 68,  y: 240, r: -35 },
+    { x: 145, y: 205, r:  25 },
+    { x: 76,  y: 170, r: -30 },
+    { x: 152, y: 135, r:  38 },
+    { x: 82,  y: 100, r: -28 },
+    { x: 148, y: 65,  r:  30 },
+    { x: 95,  y: 32,  r: -22 },
+  ];
+
+  const handleMove = (e) => setTipPos({ x: e.clientX, y: e.clientY });
+
+  return (
+    <div className="about-vine-wrap">
+      <svg viewBox="0 0 220 350" className="about-vine" aria-hidden="true">
+        {/* Stem */}
+        <path
+          d="M 100 348 C 120 308, 76 272, 110 235 C 144 198, 80 165, 118 128 C 156 92, 88 62, 122 25"
+          fill="none"
+          stroke="#C9A961"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          opacity="0.5" />
+
+        {/* Leaves — larger path + transparent fill for easy hover */}
+        {leafSpots.map((spot, i) => {
+          const isFound = i < foundCount;
+          const discoveryId = isFound ? discoveries[i] : null;
+          return (
+            <g
+              key={i}
+              transform={`translate(${spot.x}, ${spot.y}) rotate(${spot.r})`}
+              className={"about-vine__leaf" + (isFound ? " is-found" : "")}
+              style={{ opacity: isFound ? 0.85 : 0.12, transition: `opacity 900ms ease-out ${i * 120}ms` }}
+              onMouseEnter={(e) => { if (isFound) { setHoveredLeaf(discoveryId); setTipPos({ x: e.clientX, y: e.clientY }); } }}
+              onMouseMove={(e) => { if (isFound) handleMove(e); }}
+              onMouseLeave={() => setHoveredLeaf(null)}>
+              {/* Invisible hit area — large ellipse so hover is generous */}
+              <ellipse cx="0" cy="-18" rx="16" ry="22" fill="transparent" />
+              {/* Visible leaf — fill="transparent" keeps interior hit-testable */}
+              <path
+                d="M 0 0 Q 13 -18, 0 -36 Q -13 -18, 0 0 Z"
+                fill="transparent"
+                stroke="#C9A961"
+                strokeWidth="1.1" />
+              <line x1="0" y1="-2" x2="0" y2="-33" stroke="#C9A961" strokeWidth="0.5" opacity="0.7" />
+            </g>
+          );
+        })}
+
+        {/* Flower — only when all found */}
+        <g transform="translate(122, 25)">
+          <g style={{
+            transformBox: "fill-box",
+            transformOrigin: "center",
+            transform: allFound ? "scale(1)" : "scale(0)",
+            opacity: allFound ? 1 : 0,
+            transition: "opacity 1400ms ease-out 600ms, transform 1800ms cubic-bezier(0.34,1.56,0.64,1) 600ms"
+          }}>
+            {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+              <g key={i} transform={`rotate(${angle})`}>
+                <path
+                  d="M 0 0 Q 4 -9, 0 -18 Q -4 -9, 0 0 Z"
+                  fill="none"
+                  stroke="#C9A961"
+                  strokeWidth="1" />
+              </g>
+            ))}
+            <circle cx="0" cy="0" r="3" fill="#C9A961" />
+          </g>
+        </g>
+      </svg>
+
+      {/* Portal tooltip — renders at body level to escape overflow clipping */}
+      {hoveredLeaf && ReactDOM.createPortal(
+        <div
+          className="about-vine__tooltip"
+          style={{ left: tipPos.x + 18, top: tipPos.y - 14 }}>
+          {getDiscoveryLeaf(hoveredLeaf)}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
 // Mirror of cards.json bundled inline as a fallback: if fetch() is
 // blocked or the file isn't reachable, we still render real card data.
 // Keep this in sync with cards.json — cards.json wins when present.
@@ -4284,17 +5260,25 @@ window.drawCardForUser = drawCardForUser;
 
 // ─────────────────────────────────────────────────────────────────
 //  COSMIC STATE — detects birthdays, holidays, angel numbers, etc.
-//  Used by Subtitle, Reading, ShareCard, and LoadingLog.
+//  Used by Subtitle, Reading, ShareCard, LoadingLog, Landing title.
 // ─────────────────────────────────────────────────────────────────
-function useCosmicState(birthDigits) {
+function useCosmicState(birthDigits, devTick) {
   return useMemo(() => {
     const now = new Date();
+
+    // Dev mode: allow hour override via localStorage
+    let devHour = null;
+    try {
+      const raw = localStorage.getItem("dev_hour_override");
+      if (raw !== null) devHour = parseInt(raw, 10);
+    } catch (e) {/* silent */}
+
     const today = {
-      month: now.getMonth() + 1, // 1-12
-      date: now.getDate(),       // 1-31
-      hour: now.getHours(),      // 0-23
-      minute: now.getMinutes(),  // 0-59
-      day: now.getDay()          // 0=Sun, 5=Fri, ...
+      month: now.getMonth() + 1,
+      date: now.getDate(),
+      hour: devHour !== null ? devHour : now.getHours(),
+      minute: now.getMinutes(),
+      day: now.getDay()
     };
 
     // ─── Birthday ──────────────────────────────────────────────
@@ -4302,8 +5286,7 @@ function useCosmicState(birthDigits) {
     if (birthDigits && birthDigits.length === 8) {
       const birthMonth = parseInt(birthDigits.substring(4, 6), 10);
       const birthDate = parseInt(birthDigits.substring(6, 8), 10);
-      isBirthday =
-        birthMonth === today.month && birthDate === today.date;
+      isBirthday = birthMonth === today.month && birthDate === today.date;
     }
 
     // ─── Holidays ──────────────────────────────────────────────
@@ -4311,7 +5294,6 @@ function useCosmicState(birthDigits) {
     if (today.month === 12 && today.date === 25) holiday = "christmas";
     else if (today.month === 12 && today.date === 31) holiday = "newyearseve";
     else if (today.month === 1 && today.date === 1) holiday = "newyearsday";
-    // Lunar New Year 2026 = Feb 17, 2027 = Feb 6. Update yearly or use lib.
     else if (today.month === 2 && today.date === 17) holiday = "lunarnewyear";
 
     // ─── Angel Numbers ─────────────────────────────────────────
@@ -4324,9 +5306,7 @@ function useCosmicState(birthDigits) {
 
     // ─── Worker Easter Eggs ────────────────────────────────────
     let workerVibe = null;
-    // Friday after 18:00
     if (today.day === 5 && today.hour >= 18) workerVibe = "friday_evening";
-    // Sunday after 22:00
     else if (today.day === 0 && today.hour >= 22) workerVibe = "sunday_dread";
 
     // ─── First Visit ───────────────────────────────────────────
@@ -4338,24 +5318,92 @@ function useCosmicState(birthDigits) {
       }
     } catch (e) {/* silent */}
 
+    // ─── Time-of-day window ────────────────────────────────────
+    const h = today.hour;
+    let timeWindow;
+    if (h >= 0 && h < 4)        timeWindow = { id: "void",      title: "the void is listening.",              gilded: true,  anim: "breathe" };
+    else if (h >= 4 && h < 6)   timeWindow = { id: "dawn",      title: "the dawn compiles.",                  gilded: false, anim: null };
+    else if (h >= 6 && h < 9)   timeWindow = { id: "morning",   title: "the morning awaits input.",           gilded: false, anim: null };
+    else if (h >= 9 && h < 12)  timeWindow = { id: "midday",    title: "today's fate compiles at midnight.",  gilded: false, anim: null };
+    else if (h >= 12 && h < 14) timeWindow = { id: "lunch",     title: "lunch.break() is not idle.",         gilded: false, anim: null };
+    else if (h >= 14 && h < 18) timeWindow = { id: "afternoon", title: "the afternoon runs in production.",   gilded: false, anim: null };
+    else if (h >= 18 && h < 22) timeWindow = { id: "evening",   title: "the evening yields.",                 gilded: false, anim: null };
+    else                         timeWindow = { id: "night",     title: "the night is a long await.",          gilded: true,  anim: "float" };
+
+    // ─── Approximate moon phase (no API) ──────────────────────
+    // Ref new moon: Jan 6, 2000
+    const lunarDays = (now.getTime() - new Date("2000-01-06").getTime()) / (1000 * 60 * 60 * 24);
+    const lunarPhase = (lunarDays % 29.53) / 29.53;
+    const isNewMoon  = lunarPhase < 0.04 || lunarPhase > 0.96;
+    const isFullMoon = lunarPhase > 0.46 && lunarPhase < 0.54;
+    const isSpecialMoon = isNewMoon || isFullMoon;
+    const moonPhaseType = isNewMoon ? "new" : isFullMoon ? "full" : null;
+
+    // ─── Discoveries (for About vine) ──────────────────────────
+    let discoveries = [];
+    try {
+      const raw = localStorage.getItem("codices_discoveries");
+      discoveries = raw ? JSON.parse(raw) : [];
+    } catch (e) { discoveries = []; }
+
     return {
       isBirthday,
       holiday,
       angelNumber,
       workerVibe,
-      isFirstVisit
+      isFirstVisit,
+      timeWindow,
+      isSpecialMoon,
+      moonPhaseType,
+      discoveries
     };
   }, [birthDigits]);
+}
+
+// Record a discovered easter egg. Returns true only on first discovery.
+// Fires "codices:discovery" so App can show the notice banner.
+function recordDiscovery(id, context) {
+  try {
+    const raw = localStorage.getItem("codices_discoveries");
+    const found = raw ? JSON.parse(raw) : [];
+    if (!found.includes(id)) {
+      found.push(id);
+      localStorage.setItem("codices_discoveries", JSON.stringify(found));
+      window.dispatchEvent(new CustomEvent("codices:discovery", { detail: { id, context } }));
+      return true;
+    }
+  } catch (e) {/* silent */}
+  return false;
 }
 
 function App() {
   const [screen, setScreen] = useState("landing");
   const [cards, setCards] = useState(DEFAULT_CARDS);
   const [cardIdx, setCardIdx] = useState(0);
-  const [draw, setDraw] = useState(null); 
+  const [draw, setDraw] = useState(null);
   const [devOpen, setDevOpen] = useState(false);
-  const [birthDigits, setBirthDigits] = useState(""); 
-  const cosmic = useCosmicState(birthDigits); 
+  const [birthDigits, setBirthDigits] = useState("");
+  const [showAbout, setShowAbout] = useState(false);
+  const [devTick, setDevTick] = useState(0);
+  const [activeNotice, setActiveNotice] = useState(null);
+  const cosmic = useCosmicState(birthDigits, devTick);
+
+  // Expose a global so the brand logo (rendered inside child components)
+  // can open the About modal without prop-drilling.
+  useEffect(() => {
+    window.openCodicesAbout = () => setShowAbout(true);
+    return () => { delete window.openCodicesAbout; };
+  }, []);
+
+  // Listen for new discoveries and show the notice banner
+  useEffect(() => {
+    const handleDiscovery = (e) => {
+      const { id, context } = e.detail;
+      setActiveNotice({ id, context, key: Date.now() });
+    };
+    window.addEventListener("codices:discovery", handleDiscovery);
+    return () => window.removeEventListener("codices:discovery", handleDiscovery);
+  }, []);
 
   // Try inline <script id="cards-data"> first — that always works,
   // even under file:// where fetch() of a sibling JSON is blocked. Then
@@ -4404,18 +5452,12 @@ function App() {
     <>
       <CornerDecorations />
       {devOpen &&
-      <select
-        className="dev-picker"
-        value={cardIdx}
-        onChange={(e) => setCardIdx(parseInt(e.target.value, 10) || 0)}
-        aria-label="developer card picker">
-        
-          {cards.map((c, i) =>
-        <option key={c.id} value={i}>
-              {c.roman} — {c.name_codex}
-            </option>
-        )}
-        </select>
+        <DevPanel
+          cards={cards}
+          cardIdx={cardIdx}
+          onCardChange={(i) => setCardIdx(i)}
+          onDevTick={() => setDevTick((n) => n + 1)}
+          onClose={() => setDevOpen(false)} />
       }
       {screen === "landing" &&
       <Landing
@@ -4448,9 +5490,17 @@ function App() {
       <Reading
         key={card.id}
         onBack={() => setScreen("landing")}
-        card={card} 
-        cosmic={cosmic} /> 
+        card={card}
+        cosmic={cosmic} />
       }
+      {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+      {activeNotice && (
+        <DiscoveryNotice
+          key={activeNotice.key}
+          id={activeNotice.id}
+          context={activeNotice.context}
+          onDismiss={() => setActiveNotice(null)} />
+      )}
     </>);
 
 }
